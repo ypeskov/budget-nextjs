@@ -31,7 +31,7 @@ export default function AccountsPageContainer({
       </div>
       <ul className="space-y-4">
         {accounts.map((acc) => (
-          <li key={acc.id} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition">
+          <li key={acc.id} className="bg-white rounded-lg shadow p-4 hover:shadow-md  hover:bg-gray-300 transition">
             <Link href={`/accountDetails/${acc.id}`} className="block no-underline text-gray-800">
               <div className="flex justify-between text-2xl">
                 <div className="truncate max-w-xs font-medium">{acc.name}</div>
