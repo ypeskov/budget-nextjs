@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
+import jwt from "jsonwebtoken";
 import { useRouter } from "next/navigation";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "@/context/UserContext";
 
 interface FormData {
   email: string;
@@ -36,9 +37,10 @@ export default function LoginPage() {
       });
   
       if (response.ok) {
-        const data: { accessToken: string } = await response.json(); 
+        const data: { accessToken: string } = await response.json();
         document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`; 
-        setUser({ email: "user@example.com", token: data.accessToken });
+        const decoded: { email: string } = jwt.decode(data.accessToken) as { email: string };
+        setUser({ email: decoded.email, token: data.accessToken });
         
         router.push("/accounts");
       } else {
