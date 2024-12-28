@@ -36,6 +36,7 @@ export default function LoginPage() {
       if (response.ok) {
         const data: { accessToken: string } = await response.json();
         document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`;
+        window.dispatchEvent(new Event("cookieChange"));
         router.push("/accounts");
       } else {
         const errorData: { message: string } = await response.json();

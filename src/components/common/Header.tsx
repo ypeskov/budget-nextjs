@@ -7,14 +7,18 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("authToken="))
-      ?.split("=")[1];
+    const checkAuth = () => {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("authToken="))
+        ?.split("=")[1];
+      setIsAuthenticated(!!token);
+    };
 
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    checkAuth();
+    window.addEventListener("cookieChange", checkAuth);
+
+    return () => window.removeEventListener("cookieChange", checkAuth);
   }, []);
 
   return (
