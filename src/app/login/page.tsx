@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "../../context/UserContext";
 
 interface FormData {
   email: string;
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { setUser } = useUser();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,11 +34,12 @@ export default function LoginPage() {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
-        const data: { accessToken: string } = await response.json();
-        document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`;
-        window.dispatchEvent(new Event("cookieChange"));
+        const data: { accessToken: string } = await response.json(); 
+        document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`; 
+        setUser({ email: "user@example.com", token: data.accessToken });
+        
         router.push("/accounts");
       } else {
         const errorData: { message: string } = await response.json();
