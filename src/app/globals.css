@@ -19,3 +19,7 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.list-item {
+  @apply bg-white rounded-lg shadow p-4 hover:shadow-md  hover:bg-gray-300 transition;
+}

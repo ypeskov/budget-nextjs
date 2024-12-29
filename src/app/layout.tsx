@@ -20,7 +20,9 @@ export default function RootLayout({
       <body>
         <UserProvider>
           <Header />
-          {children}
+          <div className="container mx-auto px-4 py-6">
+            {children}
+          </div>
         </UserProvider>
       </body>
     </html>

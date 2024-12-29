@@ -3,12 +3,16 @@ import Link from 'next/link';
 import { Account, BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 
+function UnauthorizedMsg() {
+  return <div className="text-center text-red-500 text-3xl">Unauthorized</div>;
+}
+
 export default async function AccountsPage({ params }: { params: any }) {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('authToken')?.value || '';
 
   if (!authToken) {
-    return <div className="text-center text-red-500 text-3xl">Unauthorized</div>;
+    return <UnauthorizedMsg />;
   }
 
   let error = null;
@@ -22,9 +26,11 @@ export default async function AccountsPage({ params }: { params: any }) {
   ]);
 
   if (!accountsResponse.ok || !baseCurrencyResponse.ok) {
-    const error = !accountsResponse.ok ? 'Failed to fetch accounts' : 'Failed to fetch base currency';
-    console.error(error);
-    return <div className="text-center text-red-500">{error}</div>;
+    if (accountsResponse.status === 401 || baseCurrencyResponse.status === 401) {
+      return <UnauthorizedMsg />;
+    }
+    const error = 'Some error occurred while fetching data';
+    return <div className="text-center text-red-500 text-3xl">{error}</div>;
   }
 
   const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
