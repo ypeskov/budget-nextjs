@@ -16,8 +16,9 @@ export default async function AccountsPage({ params }: { params: any }) {
   }
 
   let error = null;
-  const accountsUrl = 'http://localhost:8000/accounts/?includeHidden=false&includeArchived=false&archivedOnly=false';
-  const baseCurrencyUrl = 'http://localhost:8000/settings/base-currency';
+  const apiBaseUrl = process.env.API_BASE_URL;
+  const accountsUrl = `${apiBaseUrl}/accounts/?includeHidden=false&includeArchived=false&archivedOnly=false`;
+  const baseCurrencyUrl = `${apiBaseUrl}/settings/base-currency`;
 
    // Fetch accounts and base currency on the server
    const [accountsResponse, baseCurrencyResponse] = await Promise.all([
