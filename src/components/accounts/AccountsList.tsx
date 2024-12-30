@@ -44,7 +44,7 @@ export default function AccountsPageContainer({
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-center">{t('yourAccounts')}</h1>
+        <h1 className="heading-lg">{t('yourAccounts')}</h1>
         <p className="text-center text-gray-700 text-2xl">
           <span>{t('totalBalance')} </span>
           <span className="text-2xl font-bold">{totalBalance.toLocaleString(undefined, amountPrecision)}{' '}{baseCurrency.code || 'N/A'}</span>
@@ -53,9 +53,9 @@ export default function AccountsPageContainer({
       <ul className="space-y-4">
         {accounts.map((acc) => (
           <li key={acc.id} className="list-item">
-            <Link href={`/accountDetails/${acc.id}`} className="block no-underline text-gray-800">
-              <div className="flex justify-between text-2xl">
-                <div className="truncate max-w-xs font-medium">{acc.name}</div>
+            <Link href={`/accountDetails/${acc.id}`} className="link-default link-hover">
+              <div className="list-item-container">
+                <div className="list-item-label">{acc.name}</div>
                 <div className={`text-right ${balanceClass(acc.balance)}`}>
                   {accountAmmounts(acc)}
                 </div>

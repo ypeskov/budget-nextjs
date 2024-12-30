@@ -5,10 +5,12 @@ import getRequestConfig from "@/i18n/request";
 // import { Services } from "@/services/servicesConfig";
 import { CREDIT_CARD_ACCOUNT_TYPE_ID } from "@/constants";
 import { Account } from "@/types/accounts";
+import { Transaction } from "@/types/transactions";
 import { getAuthToken } from "@/utils/auth";
 import { get } from "http";
 
 const apiBaseUrl = process.env.API_BASE_URL;
+const transactionsPerPage = process.env.TRANSACTIONS_PER_PAGE;
 
 interface RequestParams {
   id: string;
@@ -31,13 +33,35 @@ async function fetchAccount(id: number): Promise<Account> {
   return account;
 }
 
+async function fetchTransactions(accountId: number): Promise<Transaction[]> {
+  const authToken = await getAuthToken();
+
+  const transactionsUrl = `${apiBaseUrl}/transactions/?accounts=${accountId}`
+    + `&per_page=${transactionsPerPage}`
+    + "&page=1";
+
+  const transactions = await fetch(transactionsUrl, {
+    headers: { "auth-token": authToken },
+    cache: "no-store",
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error fetching transactions", error);
+      throw error;
+    });
+
+  return transactions;
+}
+
 export default async function AccountDetails({ params }: { params: Promise<RequestParams> }) {
   const resolvedParams = await params;
   const id = Number(resolvedParams.id);
   const locale = resolvedParams.locale;
 
-  const account: Account = await fetchAccount(id);
-  console.log(account);
+  const [account, transactions] = await Promise.all([
+    fetchAccount(id),
+    fetchTransactions(id),
+  ]);
 
   const formattedBalance = account.balance
     ? account.balance.toLocaleString(locale, {
@@ -94,7 +118,7 @@ export default async function AccountDetails({ params }: { params: Promise<Reque
         </div>
       </div>
 
-      {/* <TransactionsListView accountId={id} isAccountDetails={true} /> */}
+      <TransactionsListView transactions={transactions} locale={locale} />
     </>
   );
 }

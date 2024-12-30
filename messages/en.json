@@ -15,5 +15,8 @@
         "totalBalance": "Total balance",
         "includeHidden": "Include hidden accounts",
         "showArchivedAccounts": "Show archived accounts"
+    },
+    "AccountDetailsPage": {
+        "yourTransactions": "Your transactions"
     }
 }

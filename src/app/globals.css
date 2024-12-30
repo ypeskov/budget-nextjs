@@ -20,22 +20,62 @@ body {
   box-sizing: inherit;
 }
 
+/* Global Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /* Default background color */
+  --foreground: #000000; /* Default text color */
+  --card-bg: #ffffff; /* Background for list items (cards) */
+  --card-hover-bg: #d1cbcb; /* Hover background for list items */
+  --link-color: #1a202c; /* Default link color */
+  --link-hover-color: #2d3748; /* Hover link color */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #faf9f9;
-    --foreground: #0b0b0b;
-  }
+/* Utility Classes */
+body {
+  @apply bg-[var(--background)] text-[var(--foreground)];
+}
+
+.heading-lg {
+  @apply text-3xl font-bold text-center;
 }
 
 .list-item {
-  @apply bg-white rounded-lg shadow p-4 hover:shadow-md  hover:bg-gray-300 transition;
+  @apply bg-[var(--card-bg)] rounded-lg shadow p-4 transition;
+}
+
+.list-item:hover {
+  @apply bg-[var(--card-hover-bg)] shadow-md;
+}
+
+.list-item-container {
+  @apply flex justify-between text-2xl;
+}
+
+.list-item-label {
+  @apply truncate max-w-xs font-medium;
+}
+
+.link-default {
+  @apply text-[var(--link-color)] no-underline;
+}
+
+.link-hover {
+  @apply hover:text-[var(--link-hover-color)];
+}
+
+/* Optional: Additional Utility Styles */
+.error-msg {
+  @apply text-red-600 font-bold;
+}
+
+.card {
+  @apply bg-[var(--card-bg)] rounded-lg shadow p-4 transition;
+}
+
+.card-hover {
+  @apply hover:bg-[var(--card-hover-bg)] hover:shadow-md;
 }
 
 .info-card {
-  @apply p-4 bg-gray-100 rounded-md shadow-md;
+  @apply bg-blue-100 text-blue-900 p-4 rounded-lg shadow;
 }
