@@ -43,7 +43,7 @@ export default function AccountsPageContainer({
 
   return (
     <>
-      <div className="mb-6">
+      <div className="mb-4 mt-4">
         <h1 className="heading-lg">{t('yourAccounts')}</h1>
         <p className="text-center text-gray-700 text-2xl">
           <span>{t('totalBalance')} </span>

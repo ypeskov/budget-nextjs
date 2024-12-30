@@ -17,6 +17,7 @@
         "showArchivedAccounts": "Показати архівовані рахунки"
     },
     "AccountDetailsPage": {
-        "yourTransactions": "Ваші транзакції"   
+        "yourTransactions": "Ваші транзакції",
+        "transfer": "Трансфер"   
     }
 }

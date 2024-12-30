@@ -17,6 +17,7 @@
         "showArchivedAccounts": "Show archived accounts"
     },
     "AccountDetailsPage": {
-        "yourTransactions": "Your transactions"
+        "yourTransactions": "Your transactions",
+        "transfer": "Transfer"
     }
 }
