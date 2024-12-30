@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useState, useEffect } from "react";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
 interface User {
   email: string | null;
@@ -13,25 +13,32 @@ interface UserContextType {
   setUser: (user: User) => void;
 }
 
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY || 'your-secret-key');
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User>({ email: null, token: null });
 
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("authToken="))
-      ?.split("=")[1];
+    const loadUser = async () => {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("authToken="))
+        ?.split("=")[1];
 
-    if (token) {
-      try {
-        const decoded: { email: string } = jwt.decode(token) as { email: string };
-        setUser({ email: decoded.email, token });
-      } catch (error) {
-        console.error("Invalid token", error);
+      if (token) {
+        try {
+          const { payload } = await jwtVerify(token, SECRET_KEY);
+          const decoded = payload as { email: string };
+          setUser({ email: decoded.email, token });
+        } catch (error) {
+          console.error("Invalid token", error);
+        }
       }
-    }
+    };
+
+    loadUser();
   }, []);
 
   return (

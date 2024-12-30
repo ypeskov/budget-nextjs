@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { Account, BaseCurrency, Accounts } from '@/types/accounts';
 import { useTranslations } from 'next-intl';
-
-const CREDIT_CARD_ACCOUNT_TYPE_ID = 4;
+import { CREDIT_CARD_ACCOUNT_TYPE_ID } from '@/constants';
 
 export default function AccountsPageContainer({
   accounts,

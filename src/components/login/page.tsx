@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useUser } from "@/context/UserContext";
@@ -45,15 +45,20 @@ export default function LoginPage({ locale }: LoginPageProps) {
       if (response.ok) {
         const data: { accessToken: string } = await response.json();
         document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`;
-        const decoded: { email: string } = jwt.decode(data.accessToken) as { email: string };
-        setUser({ email: decoded.email, token: data.accessToken });
 
+        const secretKey = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET_KEY || "your-secret-key");
+        const { payload } = await jwtVerify(data.accessToken, secretKey);
+        const decoded = payload as { email: string };
+
+        setUser({ email: decoded.email, token: data.accessToken });
+        console.log('====================================');
         router.push(`/${locale}/accounts`);
       } else {
         const errorData: { message: string } = await response.json();
         setError(errorData.message || "Authentication failed");
       }
     } catch (error) {
+      console.error("Error during login:", error);
       setError("Error of connection");
     }
   };
