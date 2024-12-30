@@ -1,3 +1,13 @@
 {
-    "Test": "Оце гарна новина"
+    "HomePage": {
+        "welcomeMsg": "Вітаємо у Another Budgeter!"
+    },
+    "LoginPage": {
+        "login": "Увійти",
+        "email": "Електронна пошта",
+        "password": "Пароль",
+        "forgotPassword": "Забули пароль?",
+        "noAccount": "Не маєте облікового запису?",
+        "register": "Зареєструватися"
+    }
 }

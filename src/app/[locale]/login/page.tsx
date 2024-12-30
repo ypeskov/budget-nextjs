@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, use } from "react";
 import jwt from "jsonwebtoken";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -11,7 +11,8 @@ interface FormData {
   password: string;
 }
 
-export default function LoginPage() {
+export default function LoginPage({params}: {params: Promise<{ locale: string }>}) {
+  const {locale} = use(params);
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function LoginPage() {
         const decoded: { email: string } = jwt.decode(data.accessToken) as { email: string };
         setUser({ email: decoded.email, token: data.accessToken });
         
-        router.push("/accounts");
+        router.push(`/${locale}/accounts`);
       } else {
         const errorData: { message: string } = await response.json();
         setError(errorData.message || "Authentication failed");
@@ -52,20 +53,17 @@ export default function LoginPage() {
       setError("Error of connection");
     }
   };
-  const t = useTranslations("");
+  const t = useTranslations("LoginPage");
   return (
     <>
-      <h1>{t("Test")}</h1>
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="w-full max-w-md p-4 space-y-4 bg-white rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center">Login</h1>
+          <h1 className="text-2xl font-bold text-center">{t('login')}</h1>
           {error && <p style={{ color: "red" }}>{error}</p>}
           <form onSubmit={handleSubmit}
                  className="space-y-4">
             <div>
-              <label htmlFor="email" className="block">
-                Email
-              </label>
+              <label htmlFor="email" className="block">{t('login')}</label>
               <input
                 id="email"
                 type="email"

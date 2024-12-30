@@ -1,3 +1,13 @@
 {
-    "Test": "Test the i18n and L10n"
+    "HomePage": {
+        "welcomeMsg": "Welcome to Another Budgeter!"
+    },
+    "LoginPage": {
+        "login": "Login",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot password?",
+        "noAccount": "Don't have an account?",
+        "register": "Register"
+    }
 }
