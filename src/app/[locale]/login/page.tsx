@@ -3,6 +3,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import jwt from "jsonwebtoken";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useUser } from "@/context/UserContext";
 
 interface FormData {
@@ -51,9 +52,10 @@ export default function LoginPage() {
       setError("Error of connection");
     }
   };
-
+  const t = useTranslations("");
   return (
     <>
+      <h1>{t("Test")}</h1>
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="w-full max-w-md p-4 space-y-4 bg-white rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold text-center">Login</h1>
