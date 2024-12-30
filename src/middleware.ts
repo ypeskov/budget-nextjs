@@ -9,10 +9,10 @@ const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY || 'your-
 async function isTokenValid(token: string): Promise<boolean> {
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    console.log('Payload:', payload);
+    // console.log('Payload:', payload);
     return true;
   } catch (err) {
-    console.error('JWT validation failed:', err);
+    console.error('JWT validation failed', err);
     return false;
   }
 }

@@ -28,7 +28,7 @@ export default function FilterControls() {
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-md shadow-md">
+    <div className="info-card">
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2">
           <input

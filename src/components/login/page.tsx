@@ -51,7 +51,6 @@ export default function LoginPage({ locale }: LoginPageProps) {
         const decoded = payload as { email: string };
 
         setUser({ email: decoded.email, token: data.accessToken });
-        console.log('====================================');
         router.push(`/${locale}/accounts`);
       } else {
         const errorData: { message: string } = await response.json();

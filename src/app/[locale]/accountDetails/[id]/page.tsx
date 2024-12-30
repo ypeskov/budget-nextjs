@@ -1,61 +1,60 @@
 import { DateTime } from "luxon";
 import TransactionsListView from "@/components/transactions/TransactionsListView";
 import NewAccount from "@/components/accounts/NewAccount";
+import getRequestConfig from "@/i18n/request";
 // import { Services } from "@/services/servicesConfig";
 import { CREDIT_CARD_ACCOUNT_TYPE_ID } from "@/constants";
 import { Account } from "@/types/accounts";
+import { getAuthToken } from "@/utils/auth";
+import { get } from "http";
 
-async function fetchAccountDetails(id: number): Promise<Account> {
-  // return await Services.accountsService.getAccountDetails(id);
-  return {
-    id: 1,
-    userId: 1,
-    accountTypeId: 1,
-    currencyId: 1,
-    initialBalance: 0,
-    balance: 0,
-    creditLimit: 0,
-    name: "Test Account",
-    openingDate: "2022-01-01",
-    comment: "",
-    isHidden: false,
-    showInReports: true,
-    currency: {
-      id: 1,
-      code: "USD",
-      name: "US Dollar",
-    },
-    accountType: {
-      id: 1,
-      type_name: "Cash",
-      is_credit: false,
-    },
-    isDeleted: false,
-    balanceInBaseCurrency: 0,
-    archivedAt: "",
-  };
+const apiBaseUrl = process.env.API_BASE_URL;
+
+interface RequestParams {
+  id: string;
+  locale: string;
 }
 
+async function fetchAccount(id: number): Promise<Account> {
+  const authToken = await getAuthToken();
 
-export default async function AccountDetails({ id }: Account) {
-  const accountDetails: Account = await fetchAccountDetails(id);
+  const account: Account = await fetch(`${apiBaseUrl}/accounts/${id}`, {
+    headers: { "auth-token": authToken },
+    cache: "no-store",
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error fetching account details", error);
+      throw error;
+    });
 
-  const formattedBalance = accountDetails.balance
-    ? accountDetails.balance.toLocaleString("ru-UA", {
+  return account;
+}
+
+export default async function AccountDetails({ params }: { params: Promise<RequestParams> }) {
+  const resolvedParams = await params;
+  const id = Number(resolvedParams.id);
+  const locale = resolvedParams.locale;
+
+  const account: Account = await fetchAccount(id);
+  console.log(account);
+
+  const formattedBalance = account.balance
+    ? account.balance.toLocaleString(locale, {
       style: "decimal",
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
     })
     : "0.00";
 
-  const availableBalanceCC = accountDetails.balance + accountDetails.creditLimit;
+  const availableBalanceCC = account.balance + account.creditLimit;
 
   return (
     <>
-      <div className="bg-gray-200 p-4 rounded-md mb-4">
+      <div className="info-card">
         <div className="flex justify-between items-center">
           <span>
-            Account: <strong>{accountDetails.name}</strong>
+            Account: <strong>{account.name}</strong>
           </span>
           <button className="text-blue-500">
             <img
@@ -71,10 +70,10 @@ export default async function AccountDetails({ id }: Account) {
         <div className="flex justify-between items-center mt-2">
           <span>
             Balance: <b>{formattedBalance}</b>
-            {accountDetails.accountTypeId === CREDIT_CARD_ACCOUNT_TYPE_ID && (
+            {account.accountTypeId === CREDIT_CARD_ACCOUNT_TYPE_ID && (
               <span>({availableBalanceCC})</span>
             )}
-            &nbsp;{accountDetails?.currency?.code}
+            &nbsp;{account?.currency?.code}
           </span>
           <button className="text-red-500">
             <img
@@ -90,7 +89,7 @@ export default async function AccountDetails({ id }: Account) {
         <div className="mt-2">
           <span>
             Created:{" "}
-            <b>{DateTime.fromISO(accountDetails?.openingDate).toISODate()}</b>
+            <b>{DateTime.fromISO(account?.openingDate).toISODate()}</b>
           </span>
         </div>
       </div>

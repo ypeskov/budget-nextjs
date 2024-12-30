@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { Account, BaseCurrency, Accounts } from '@/types/accounts';
 import { useTranslations } from 'next-intl';
 import { CREDIT_CARD_ACCOUNT_TYPE_ID } from '@/constants';
