@@ -9,5 +9,11 @@
         "forgotPassword": "Забули пароль?",
         "noAccount": "Не маєте облікового запису?",
         "register": "Зареєструватися"
+    },
+    "AccountsPage": {
+        "yourAccounts": "Ваші рахунки",
+        "totalBalance": "Загальний баланс",
+        "includeHidden": "Включити приховані рахунки",
+        "showArchivedAccounts": "Показати архівовані рахунки"
     }
 }

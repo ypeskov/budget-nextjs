@@ -2,12 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 
 export default function FilterControls() {
   const router = useRouter();
 
   const [includeHidden, setIncludeHidden] = useState(false);
   const [archivedOnly, setArchivedOnly] = useState(false);
+  const t = useTranslations("AccountsPage");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -27,7 +29,6 @@ export default function FilterControls() {
 
   return (
     <div className="p-4 bg-gray-100 rounded-md shadow-md">
-      <h2 className="text-lg font-semibold mb-4 text-gray-700">Filters</h2>
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2">
           <input
@@ -39,7 +40,7 @@ export default function FilterControls() {
               updateQuery("includeHidden", e.target.checked);
             }}
           />
-          <span className="text-gray-700">Include Hidden</span>
+          <span className="text-gray-700">{t('includeHidden')}</span>
         </label>
         <label className="flex items-center gap-2">
           <input
@@ -51,7 +52,7 @@ export default function FilterControls() {
               updateQuery("archivedOnly", e.target.checked);
             }}
           />
-          <span className="text-gray-700">Show Archived Accounts</span>
+          <span className="text-gray-700">{t('showArchivedAccounts')}</span>
         </label>
       </div>
     </div>

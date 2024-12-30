@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Account, BaseCurrency, Accounts } from '@/types/accounts';
+import { useTranslations } from 'next-intl';
 
 const CREDIT_CARD_ACCOUNT_TYPE_ID = 4;
 
@@ -13,6 +14,7 @@ export default function AccountsPageContainer({
   const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
   const availableBalanceCC = (acc: Account) => acc.balance + acc.creditLimit;
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balanceInBaseCurrency, 0);
+  const t = useTranslations("AccountsPage");
 
   function accountAmmounts(acc: Account) {
     return (
@@ -43,9 +45,9 @@ export default function AccountsPageContainer({
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-center">Your Accounts</h1>
+        <h1 className="text-3xl font-bold text-center">{t('yourAccounts')}</h1>
         <p className="text-center text-gray-700 text-2xl">
-          <span>Total Balance: </span>
+          <span>{t('totalBalance')} </span>
           <span className="text-2xl font-bold">{totalBalance.toLocaleString(undefined, amountPrecision)}{' '}{baseCurrency.code || 'N/A'}</span>
         </p>
       </div>

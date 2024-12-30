@@ -9,5 +9,11 @@
         "forgotPassword": "Forgot password?",
         "noAccount": "Don't have an account?",
         "register": "Register"
+    },
+    "AccountsPage": {
+        "yourAccounts": "Your accounts",
+        "totalBalance": "Total balance",
+        "includeHidden": "Include hidden accounts",
+        "showArchivedAccounts": "Show archived accounts"
     }
 }

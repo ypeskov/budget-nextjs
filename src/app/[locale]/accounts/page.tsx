@@ -8,9 +8,9 @@ function UnauthorizedMsg() {
 }
 
 export default async function AccountsPage({
-  searchParams,
+  searchParams
 }: {
-  searchParams: Record<string, string | undefined>;
+  searchParams: Record<string, string | undefined>,
 }) {
   const awaitedSearchParams = await searchParams;
   const cookieStore = await cookies();
