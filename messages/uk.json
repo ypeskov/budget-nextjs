@@ -35,6 +35,7 @@
         "isArchived": "Архівований",
         "showInReports": "Показати в звітах",
         "accountType": "Тип рахунку",
-        "currency": "Валюта"
+        "currency": "Валюта",
+        "initialBalance": "Початковий баланс"
     }
 }

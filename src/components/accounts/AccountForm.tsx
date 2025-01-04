@@ -33,30 +33,27 @@ const parseLocalizedNumber = (value: string): number => {
   return parseFloat(normalizedValue);
 };
 
+const getFormattedNumber = (value: number, locale: string): string => {
+  return value.toLocaleString(locale, {
+    style: "decimal",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
+}
+
 const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) => {
   const router = useRouter();
   const t = useTranslations("AccountDetailsPage");
 
-  const formattedBalance = account?.balance
-    ? account.balance.toLocaleString(locale, {
-      style: "decimal",
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2,
-    })
-    : "0.00";
-
-  const formattedCreditLimit = account?.creditLimit
-    ? account.creditLimit.toLocaleString(locale, {
-      style: "decimal",
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2,
-    })
-    : "0.00";
+  const formattedBalance = account?.balance ? getFormattedNumber(account.balance, locale) : "0.00";
+  const formattedCreditLimit = account?.creditLimit ? getFormattedNumber(account.creditLimit, locale) : "0.00";
+  const formattedInitialBalance = account?.balance ? getFormattedNumber(account.initialBalance, locale) : "0.00";
 
   const [accountType, setAccountType] = useState<number>(1);
   const [currency, setCurrency] = useState<number>(1);
   const [name, setName] = useState<string>(account?.name ? account.name : "");
   const [balance, setBalance] = useState<string>(formattedBalance);
+  const [initialBalance, setInitialBalance] = useState<string>(formattedInitialBalance);
   const [creditLimit, setCreditLimit] = useState<string>(formattedCreditLimit);
 
   const [openingDate, setOpeningDate] = useState<string>(
@@ -106,16 +103,14 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalizedBalance = parseLocalizedNumber(balance);
-    const normalizedCreditLimit = parseLocalizedNumber(creditLimit);
-
     const accountData = {
       id: account?.id,
       accountTypeId: accountType,
       currencyId: currency,
       name,
-      balance: normalizedBalance,
-      creditLimit: normalizedCreditLimit,
+      balance: parseLocalizedNumber(balance),
+      initialBalance: parseLocalizedNumber(initialBalance),
+      creditLimit: parseLocalizedNumber(creditLimit),
       openingDate,
       comment,
       isHidden,
@@ -212,6 +207,16 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">{t("initialBalance")}:</label>
+            <input
+              type="text"
+              value={initialBalance}
+              onChange={(e) => setInitialBalance(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium">{t("creditLimit")}:</label>
             <input

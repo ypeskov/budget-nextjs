@@ -35,6 +35,7 @@
         "isArchived": "Is archived",
         "showInReports": "Show in reports",
         "accountType": "Account type",
-        "currency": "Currency"
+        "currency": "Currency",
+        "initialBalance": "Initial balance"
     }
 }
