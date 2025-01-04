@@ -6,16 +6,21 @@ import { CREDIT_CARD_ACCOUNT_TYPE_ID } from "@/constants";
 import { Account } from "@/types/accounts";
 import { useState } from "react";
 import AccountForm from "@/components/accounts/AccountForm";
+import { getCookie } from "@/utils/cookies";
+import { useRouter } from "next/navigation";
 
 interface AccountDetailsProps {
   account: Account;
   locale: string;
 }
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function AccountDetails({ account, locale }: AccountDetailsProps) {
   const t = useTranslations("AccountDetailsPage");
   const [showEditForm, setShowEditForm] = useState(false);
   const availableBalanceCC = account.balance + account.creditLimit;
+  const router = useRouter();
 
   const formattedBalance = account.balance
     ? account.balance.toLocaleString(locale, {
@@ -27,6 +32,26 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
 
   const toggleEditForm = () => {
     setShowEditForm(!showEditForm);
+  }
+
+  const deleteAccount = () => {
+    const authToken = getCookie('authToken');
+    const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
+    fetch(`${apiBaseUrl}/accounts/${account.id}`, {
+      method: 'DELETE',
+      headers: headers,
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Account deleted');
+          router.push(`/${locale}/accounts`);
+        } else {
+          console.error('Error deleting account');
+        }
+      })
+      .catch((error) => {
+        console.error('Error deleting account', error);
+      });
   }
 
   return (
@@ -62,6 +87,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
               alt={t('deleteAccount')}
               width="24"
               height="24"
+              onClick={deleteAccount}
               title={t('deleteAccount')}
             />
           </button>

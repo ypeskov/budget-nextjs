@@ -14,7 +14,8 @@
         "yourAccounts": "Ваші рахунки",
         "totalBalance": "Загальний баланс",
         "includeHidden": "Включити приховані рахунки",
-        "showArchivedAccounts": "Показати архівовані рахунки"
+        "showArchivedAccounts": "Показати архівовані рахунки",
+        "new": "Новий"
     },
     "AccountDetailsPage": {
         "yourTransactions": "Ваші транзакції",

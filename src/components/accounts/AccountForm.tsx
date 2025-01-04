@@ -7,8 +7,8 @@ import { Account } from "@/types/accounts";
 import { getCookie } from "@/utils/cookies";
 import { useTranslations } from "next-intl";
 
-interface NewAccountProps {
-  account: Account;
+interface EditAccountProps {
+  account?: Account;
   closeForm: () => void;
   locale: string;
 }
@@ -33,11 +33,11 @@ const parseLocalizedNumber = (value: string): number => {
   return parseFloat(normalizedValue);
 };
 
-const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) => {
+const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) => {
   const router = useRouter();
   const t = useTranslations("AccountDetailsPage");
 
-  const formattedBalance = account.balance
+  const formattedBalance = account?.balance
     ? account.balance.toLocaleString(locale, {
       style: "decimal",
       maximumFractionDigits: 2,
@@ -45,7 +45,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
     })
     : "0.00";
 
-  const formattedCreditLimit = account.creditLimit
+  const formattedCreditLimit = account?.creditLimit
     ? account.creditLimit.toLocaleString(locale, {
       style: "decimal",
       maximumFractionDigits: 2,
@@ -55,12 +55,12 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
 
   const [accountType, setAccountType] = useState<number>(1);
   const [currency, setCurrency] = useState<number>(1);
-  const [name, setName] = useState<string>(account.name);
+  const [name, setName] = useState<string>(account?.name ? account.name : "");
   const [balance, setBalance] = useState<string>(formattedBalance);
   const [creditLimit, setCreditLimit] = useState<string>(formattedCreditLimit);
 
   const [openingDate, setOpeningDate] = useState<string>(
-    account.openingDate ? account.openingDate : DateTime.now().toISO()
+    account?.openingDate ? account.openingDate : DateTime.now().toISO()
   );
 
   const [comment, setComment] = useState<string>("");
@@ -79,7 +79,6 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
       setName(account.name);
       setBalance(formattedBalance);
       setCreditLimit(formattedCreditLimit);
-      // const formattedOpeningDate = DateTime.fromISO(openingDate).toFormat("yyyy-MM-dd'T'HH:mm");
       setComment(account.comment);
       setIsHidden(account.isHidden);
       setShowInReports(account.showInReports);
@@ -124,30 +123,27 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
     };
 
     try {
+      headers["auth-token"] = authToken == null ? "" : authToken;
+      headers["Content-Type"] = "application/json";
       if (account) {
-        headers["auth-token"] = authToken == null ? "" : authToken;
-        headers["Content-Type"] = "application/json";
         await fetch(`${apiBaseUrl}/accounts/${account.id}`, {
           method: "PUT",
           headers: headers,
           body: JSON.stringify(accountData),
         });
+        router.push(`/${locale}/accountDetails/${account.id}`);
       } else {
-        await fetch("/api/accounts", {
+        const accountCreated: Account = await fetch(`${apiBaseUrl}/accounts/`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: headers,
           body: JSON.stringify(accountData),
-        });
+        }).then((res) => res.json());
+        router.push(`/${locale}/accountDetails/${accountCreated.id}`);
       }
-      router.push(`/${locale}/accountDetails/${account.id}`);
       closeForm();
     } catch (error) {
       console.error("Failed to submit form", error);
     }
-  };
-
-  const closeNewAccForm = () => {
-    closeForm();
   };
 
   return (
@@ -164,7 +160,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
       >
         <button
           className="absolute top-3 right-3 text-black hover:text-gray-800"
-          onClick={closeNewAccForm}
+          onClick={() => closeForm()}
         >
           ✖
         </button>
@@ -269,7 +265,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
             <button
               type="button"
               className="mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              onClick={closeNewAccForm}
+              onClick={() => closeForm()}
             >
               {t("cancel")}
             </button>

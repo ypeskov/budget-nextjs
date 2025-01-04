@@ -8,10 +8,14 @@ function UnauthorizedMsg() {
 }
 
 export default async function AccountsPage({
-  searchParams
+  searchParams,
+  params
 }: {
   searchParams: Record<string, string | undefined>,
+  params: Promise<{ locale: string }>
 }) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
   const awaitedSearchParams = await searchParams;
   const cookieStore = await cookies();
   const authToken = cookieStore.get('authToken')?.value || '';
@@ -60,7 +64,7 @@ export default async function AccountsPage({
 
   return (
     <>
-      <FilterControls />
+      <FilterControls locale={locale} />
       <AccountsList accounts={accounts} baseCurrency={baseCurrency} />
     </>
   );

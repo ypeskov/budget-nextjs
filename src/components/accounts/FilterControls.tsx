@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from 'next-intl';
+import AccountForm from "@/components/accounts/AccountForm";
 
-export default function FilterControls() {
+export default function FilterControls({ locale }: { locale: string }) {
   const router = useRouter();
 
   const [includeHidden, setIncludeHidden] = useState(false);
   const [archivedOnly, setArchivedOnly] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const t = useTranslations("AccountsPage");
 
   useEffect(() => {
@@ -25,6 +27,10 @@ export default function FilterControls() {
       params.delete(key);
     }
     router.push(`?${params.toString()}`);
+  };
+
+  const toggleEditForm = () => {
+    setShowEditForm(!showEditForm);
   };
 
   return (
@@ -54,7 +60,14 @@ export default function FilterControls() {
           />
           <span className="text-gray-700">{t('showArchivedAccounts')}</span>
         </label>
+        <button
+          className="ml-auto px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={toggleEditForm}
+        >
+          {t('new')}
+        </button>
       </div>
+      {showEditForm && <AccountForm closeForm={toggleEditForm} locale={locale} />}
     </div>
   );
 }
