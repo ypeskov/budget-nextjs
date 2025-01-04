@@ -25,6 +25,13 @@
         "account": "Рахунок",
         "name": "Назва",
         "save": "Зберегти",
-        "cancel": "Скасувати"
+        "cancel": "Скасувати",
+        "editAccount": "Редагувати рахунок",
+        "creditLimit": "Кредитний ліміт",
+        "openingDate": "Дата відкриття",
+        "comment": "Коментар",
+        "isHidden": "Прихований",
+        "isArchived": "Архівований",
+        "showInReports": "Показати в звітах"
     }
 }

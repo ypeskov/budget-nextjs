@@ -25,6 +25,13 @@
         "account": "Account",
         "name": "Name",
         "save": "Save",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "editAccount": "Edit account",
+        "creditLimit": "Credit limit",
+        "openingDate": "Opening date",
+        "comment": "Comment",
+        "isHidden": "Is hidden",
+        "isArchived": "Is archived",
+        "showInReports": "Show in reports"
     }
 }
