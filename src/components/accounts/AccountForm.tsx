@@ -13,6 +13,18 @@ interface NewAccountProps {
   locale: string;
 }
 
+interface AccountType {
+  id: number;
+  type_name: string;
+  is_credit: boolean;
+}
+
+interface Currency {
+  id: number;
+  code: string;
+  name: string;
+}
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const parseLocalizedNumber = (value: string): number => {
@@ -27,22 +39,34 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
 
   const formattedBalance = account.balance
     ? account.balance.toLocaleString(locale, {
-        style: "decimal",
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-      })
+      style: "decimal",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    })
+    : "0.00";
+
+  const formattedCreditLimit = account.creditLimit
+    ? account.creditLimit.toLocaleString(locale, {
+      style: "decimal",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    })
     : "0.00";
 
   const [accountType, setAccountType] = useState<number>(1);
   const [currency, setCurrency] = useState<number>(1);
   const [name, setName] = useState<string>(account.name);
   const [balance, setBalance] = useState<string>(formattedBalance);
-  const [creditLimit, setCreditLimit] = useState<string>('0.00');
-  const [openingDate, setOpeningDate] = useState<string>(DateTime.now().toISO());
+  const [creditLimit, setCreditLimit] = useState<string>(formattedCreditLimit);
+
+  const [openingDate, setOpeningDate] = useState<string>(
+    account.openingDate ? account.openingDate : DateTime.now().toISO()
+  );
+
   const [comment, setComment] = useState<string>("");
   const [isHidden, setIsHidden] = useState<boolean>(false);
   const [showInReports, setShowInReports] = useState<boolean>(false);
-  const [accountTypes, setAccountTypes] = useState([]);
+  const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
   const [currencies, setCurrencies] = useState([]);
 
   const authToken = getCookie("authToken");
@@ -54,8 +78,8 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
       setCurrency(account.currencyId);
       setName(account.name);
       setBalance(formattedBalance);
-      setCreditLimit(account.creditLimit.toString());
-      setOpeningDate(DateTime.fromISO(account.openingDate).toISO() as string);
+      setCreditLimit(formattedCreditLimit);
+      // const formattedOpeningDate = DateTime.fromISO(openingDate).toFormat("yyyy-MM-dd'T'HH:mm");
       setComment(account.comment);
       setIsHidden(account.isHidden);
       setShowInReports(account.showInReports);
@@ -65,7 +89,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
   useEffect(() => {
     async function fetchData() {
       try {
-        const types = await fetch(`${apiBaseUrl}/accounts/types/`, { headers }).then((res) =>
+        const types: AccountType[] = await fetch(`${apiBaseUrl}/accounts/types/`, { headers }).then((res) =>
           res.json()
         );
         const currencies = await fetch(`${apiBaseUrl}/currencies/`, { headers }).then((res) =>
@@ -132,14 +156,14 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
       style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div
-        className="rounded-lg shadow-lg w-1/3 p-6"
+        className="rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-6 relative"
         style={{
           backgroundColor: "var(--background)",
           color: "var(--foreground)",
         }}
       >
         <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+          className="absolute top-3 right-3 text-black hover:text-gray-800"
           onClick={closeNewAccForm}
         >
           ✖
@@ -154,6 +178,34 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
               onChange={(e) => setName(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">{t("currency")}:</label>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(parseInt(e.target.value, 10))}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            >
+              {currencies.map((currency: Currency) => (
+                <option key={currency.id} value={currency.id}>
+                  {currency.code} - {currency.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">{t("accountType")}:</label>
+            <select
+              value={accountType}
+              onChange={(e) => setAccountType(parseInt(e.target.value, 10))}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            >
+              {accountTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.type_name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">{t("balance")}:</label>
@@ -177,8 +229,11 @@ const NewAccount: React.FC<NewAccountProps> = ({ account, closeForm, locale }) =
             <label className="block text-sm font-medium">{t("openingDate")}:</label>
             <input
               type="datetime-local"
-              value={openingDate}
-              onChange={(e) => setOpeningDate(e.target.value)}
+              value={DateTime.fromISO(openingDate).toFormat("yyyy-MM-dd'T'HH:mm")}
+              onChange={(e) => {
+                const newDate = DateTime.fromFormat(e.target.value, "yyyy-MM-dd'T'HH:mm");
+                setOpeningDate(newDate.isValid ? newDate.toISO() : openingDate);
+              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>

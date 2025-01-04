@@ -32,6 +32,8 @@
         "comment": "Comment",
         "isHidden": "Is hidden",
         "isArchived": "Is archived",
-        "showInReports": "Show in reports"
+        "showInReports": "Show in reports",
+        "accountType": "Account type",
+        "currency": "Currency"
     }
 }

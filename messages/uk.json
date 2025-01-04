@@ -32,6 +32,8 @@
         "comment": "Коментар",
         "isHidden": "Прихований",
         "isArchived": "Архівований",
-        "showInReports": "Показати в звітах"
+        "showInReports": "Показати в звітах",
+        "accountType": "Тип рахунку",
+        "currency": "Валюта"
     }
 }
