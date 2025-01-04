@@ -9,8 +9,8 @@ import { Transaction } from "@/types/transactions";
 import { getAuthToken } from "@/utils/auth";
 import { get } from "http";
 
-const apiBaseUrl = process.env.API_BASE_URL;
-const transactionsPerPage = process.env.TRANSACTIONS_PER_PAGE;
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 interface RequestParams {
   id: string;
@@ -118,7 +118,7 @@ export default async function AccountDetails({ params }: { params: Promise<Reque
         </div>
       </div>
 
-      <TransactionsListView transactions={transactions} locale={locale} />
+      <TransactionsListView transactions={transactions} locale={locale} accountId={account.id} />
     </>
   );
 }

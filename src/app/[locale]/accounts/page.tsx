@@ -25,7 +25,8 @@ export default async function AccountsPage({
   const archivedOnly = awaitedSearchParams.archivedOnly === "true";
 
   let error = null;
-  const apiBaseUrl = process.env.API_BASE_URL;
+  
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   const accountsUrl = `${apiBaseUrl}/accounts/?includeHidden=${includeHidden}` +
     `&includeArchived=${includeArchived}` +
     `&archivedOnly=${archivedOnly}`;
