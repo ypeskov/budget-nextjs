@@ -18,6 +18,13 @@
     },
     "AccountDetailsPage": {
         "yourTransactions": "Your transactions",
-        "transfer": "Transfer"
+        "transfer": "Transfer",
+        "created": "Created",
+        "deleteAccount": "Delete account",
+        "balance": "Balance",
+        "account": "Account",
+        "name": "Name",
+        "save": "Save",
+        "cancel": "Cancel"
     }
 }

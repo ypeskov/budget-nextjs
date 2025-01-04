@@ -18,6 +18,13 @@
     },
     "AccountDetailsPage": {
         "yourTransactions": "Ваші транзакції",
-        "transfer": "Трансфер"   
+        "transfer": "Трансфер",
+        "created": "Створено",
+        "deleteAccount": "Видалити рахунок",
+        "balance": "Баланс",
+        "account": "Рахунок",
+        "name": "Назва",
+        "save": "Зберегти",
+        "cancel": "Скасувати"
     }
 }

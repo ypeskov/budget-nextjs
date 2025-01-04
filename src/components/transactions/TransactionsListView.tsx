@@ -52,7 +52,7 @@ export default function TransactionsListView({ transactions, locale, accountId }
     } finally {
       setLoading(false);
     }
-  }, [accountId, page, locale, hasMore, loading]);
+  }, [loading, hasMore, page, accountId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,31 +81,67 @@ export default function TransactionsListView({ transactions, locale, accountId }
     }
   }
 
+  const groupTransactionsByDate = (transactions: Transaction[]) => {
+    const grouped: { date: string; transactions: Transaction[] }[] = [];
+    let currentGroup: { date: string; transactions: Transaction[] } | null = null;
+
+    for (const transaction of transactions) {
+      const transactionDate = new Date(transaction.dateTime).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      if (!currentGroup || currentGroup.date !== transactionDate) {
+        currentGroup = { date: transactionDate, transactions: [] };
+        grouped.push(currentGroup);
+      }
+
+      currentGroup.transactions.push(transaction);
+    }
+
+    return grouped;
+  };
+
   return (
     <>
       <div className="mb-4 mt-4">
         <h1 className="heading-lg">{t('yourTransactions')}</h1>
       </div>
       <ul className="space-y-4">
-        {transactionList.map((trans: Transaction) => (
-          <li key={trans.id} className="list-item">
-            <Link href={`/accountDetails/${trans.id}`} className="link-default link-hover">
-              <div className="list-item-container">
-                <div className="list-tem-label">
-                  <div>{trans.label}</div>
-                  <div className="text-sm text-gray-500">{trans.category?.name || t('transfer')}</div>
-                </div>
-                <div className={`text-right ${transactionColor(trans)}`}>
-                  <div>
-                    {trans.amount.toLocaleString(locale, amountPrecision)}{' '}{trans.account.currency.code}
+        {groupTransactionsByDate(transactionList).map(({ date, transactions }) => (
+          <div key={date}>
+            <li className="list-date flex justify-center">
+              <div className="text-lg font-semibold text-gray-700 text-center">{date}</div>
+            </li>
+            {transactions.map((trans) => (
+              <li key={trans.id} className="list-item">
+                <Link href={`/accountDetails/${trans.id}`} className="link-default link-hover">
+                  <div className="list-item-container">
+                    <div className="list-item-label">
+                      <div>{trans.label}</div>
+                      <div className="text-sm text-gray-500">
+                        {trans.category?.name || t('transfer')}
+                      </div>
+                    </div>
+                    <div className={`text-right ${transactionColor(trans)}`}>
+                      <div>
+                        {trans.amount.toLocaleString(locale, amountPrecision)}{' '}
+                        {trans.account.currency.code}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        ({trans.baseCurrencyAmount.toLocaleString(
+                          locale,
+                          amountPrecision
+                        )}{' '}
+                        {trans.baseCurrencyCode})
+                      </div>
+                    </div>
                   </div>
-                  <div className='text-sm text-gray-500'>
-                    ({trans.baseCurrencyAmount.toLocaleString(locale, amountPrecision)}{' '}{trans.baseCurrencyCode})
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </li>
+                </Link>
+              </li>
+            ))}
+          </div>
         ))}
       </ul>
     </>
