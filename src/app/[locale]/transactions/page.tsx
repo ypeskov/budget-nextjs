@@ -3,6 +3,7 @@ import TransactionsListView from '@/components/transactions/TransactionsListView
 import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
 import { prepareRequestUrl } from '@/utils/transactions';
+import TransactionsFilter from '@/components/transactions/TransactionsFilter';
 
 interface TransactionsPageProps {
   params: Promise<{ locale: string }>;
@@ -38,8 +39,11 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
 
   const transactions = await fetchTransactions(resolvedSearchParams);
 
+  const accounts: string[] = [17, 18, 19, 20, 21, 22, 23, 24, 25, 26].map(String);
+
   return (
     <>
+      <TransactionsFilter accounts={accounts} locale={locale} searchParams={resolvedSearchParams} />
       <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
     </>
   );

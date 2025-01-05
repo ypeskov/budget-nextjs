@@ -79,3 +79,12 @@ body {
 .info-card {
   @apply bg-blue-100 text-blue-900 p-4 rounded-lg shadow;
 }
+
+/* Smooth transition for transform and max-height */
+.transition-transform {
+  transition: transform 0.3s ease-in-out;
+}
+
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
