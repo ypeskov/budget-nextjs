@@ -49,17 +49,16 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
   const formattedCreditLimit = account?.creditLimit ? getFormattedNumber(account.creditLimit, locale) : "0.00";
   const formattedInitialBalance = account?.balance ? getFormattedNumber(account.initialBalance, locale) : "0.00";
 
+  const [error, setError] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<number>(1);
   const [currency, setCurrency] = useState<number>(1);
   const [name, setName] = useState<string>(account?.name ? account.name : "");
   const [balance, setBalance] = useState<string>(formattedBalance);
   const [initialBalance, setInitialBalance] = useState<string>(formattedInitialBalance);
   const [creditLimit, setCreditLimit] = useState<string>(formattedCreditLimit);
-
   const [openingDate, setOpeningDate] = useState<string>(
     account?.openingDate ? account.openingDate : DateTime.now().toISO()
   );
-
   const [comment, setComment] = useState<string>("");
   const [isHidden, setIsHidden] = useState<boolean>(false);
   const [showInReports, setShowInReports] = useState<boolean>(false);
@@ -103,6 +102,7 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const accountData = {
       id: account?.id,
       accountTypeId: accountType,
@@ -118,26 +118,37 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
     };
 
     try {
-      headers["auth-token"] = authToken == null ? "" : authToken;
+      headers["auth-token"] = authToken || "";
       headers["Content-Type"] = "application/json";
+
       if (account) {
-        await fetch(`${apiBaseUrl}/accounts/${account.id}`, {
+        // PUT to update existing account
+        const response = await fetch(`${apiBaseUrl}/accounts/${account.id}`, {
           method: "PUT",
           headers: headers,
           body: JSON.stringify(accountData),
         });
+        if (!response.ok) {
+          throw new Error(`Failed to update account: ${response.statusText}`);
+        }
         router.push(`/${locale}/accountDetails/${account.id}`);
       } else {
-        const accountCreated: Account = await fetch(`${apiBaseUrl}/accounts/`, {
+        // POST to create new account
+        const response = await fetch(`${apiBaseUrl}/accounts/`, {
           method: "POST",
           headers: headers,
           body: JSON.stringify(accountData),
-        }).then((res) => res.json());
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to create account: ${response.statusText}`);
+        }
+        const accountCreated = await response.json();
         router.push(`/${locale}/accountDetails/${accountCreated.id}`);
       }
       closeForm();
     } catch (error) {
-      console.error("Failed to submit form", error);
+      console.error("Failed to submit form");
+      setError(t('addError'));
     }
   };
 
@@ -146,28 +157,24 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
-      <div
-        className="rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-6 relative"
+      <div className="rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl p-6 relative"
         style={{
           backgroundColor: "var(--background)",
           color: "var(--foreground)",
-        }}
-      >
-        <button
-          className="absolute top-3 right-3 text-black hover:text-gray-800"
-          onClick={() => closeForm()}
-        >
-          ✖
-        </button>
+        }}>
+        <button className="absolute top-3 right-3 text-black hover:text-gray-800" onClick={() => closeForm()}>✖</button>
+
+        {/* Display error message */}
+        {error && (<div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">{error}</div>)}
+
         <h1 className="text-xl font-bold mb-4">{t("editAccount")}</h1>
         <form onSubmit={handleFormSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium">{t("name")}:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            <input type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
           <div className="mb-4">

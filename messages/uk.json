@@ -36,6 +36,10 @@
         "showInReports": "Показати в звітах",
         "accountType": "Тип рахунку",
         "currency": "Валюта",
-        "initialBalance": "Початковий баланс"
+        "initialBalance": "Початковий баланс",
+        "deleteConfirmationMessage": "Ви впевнені, що хочете видалити цей рахунок?",
+        "confirm": "Підтвердити",
+        "confirmDelete": "Підтвердити видалення",
+        "addError": "Під час відправлення сталася помилка"
     }
 }

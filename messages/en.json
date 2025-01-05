@@ -36,6 +36,10 @@
         "showInReports": "Show in reports",
         "accountType": "Account type",
         "currency": "Currency",
-        "initialBalance": "Initial balance"
+        "initialBalance": "Initial balance",
+        "deleteConfirmationMessage": "Are you sure you want to delete this account?",
+        "confirm": "Confirm",
+        "confirmDelete": "Confirm delete",
+        "addError": "Some error happened during submit"
     }
 }
