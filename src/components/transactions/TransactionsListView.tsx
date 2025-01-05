@@ -129,10 +129,7 @@ export default function TransactionsListView({ transactions, locale, accountId }
                         {trans.account.currency.code}
                       </div>
                       <div className="text-sm text-gray-500">
-                        ({trans.baseCurrencyAmount.toLocaleString(
-                          locale,
-                          amountPrecision
-                        )}{' '}
+                        ({trans.baseCurrencyAmount.toLocaleString(locale,amountPrecision)}{' '}
                         {trans.baseCurrencyCode})
                       </div>
                       <div className="text-sm text-blue-500">
