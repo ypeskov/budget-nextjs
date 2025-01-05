@@ -64,7 +64,7 @@ export default function FilterControls({ locale }: { locale: string }) {
           className="ml-auto px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={toggleEditForm}
         >
-          {t('new')}
+          {t('newAccount')}
         </button>
       </div>
       {showEditForm && <AccountForm closeForm={toggleEditForm} locale={locale} />}
