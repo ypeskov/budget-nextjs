@@ -11,7 +11,7 @@ export default async function AccountsPage({
   searchParams,
   params
 }: {
-  searchParams: Record<string, string | undefined>,
+  searchParams: Promise<Record<string, string | undefined>>;
   params: Promise<{ locale: string }>
 }) {
   const resolvedParams = await params;

@@ -5,9 +5,8 @@ import "./globals.css";
 
 interface RootLayoutProps {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
-
 import { UserProvider } from "@/context/UserContext";
 import Header from "@/components/common/Header";
 

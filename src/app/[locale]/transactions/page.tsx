@@ -2,13 +2,12 @@ import { getTranslations } from 'next-intl/server';
 import TransactionsListView from '@/components/transactions/TransactionsListView';
 import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
+import { prepareRequestUrl } from '@/utils/transactions';
 
 interface TransactionsPageProps {
-  locale: string;
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 async function fetchWithErrorHandling(url: string): Promise<any> {
   const response = await fetch(url, {
@@ -25,24 +24,23 @@ async function fetchWithErrorHandling(url: string): Promise<any> {
   return response.json();
 }
 
-async function fetchTransactions(): Promise<Transaction[]> {
-  const transactionsUrl = `${apiBaseUrl}/transactions/?`
-    + `&per_page=${transactionsPerPage}`
-    + "&page=1";
-
+async function fetchTransactions(searchParams: Record<string, string | undefined>): Promise<Transaction[]> {
+  const transactionsUrl = prepareRequestUrl(1, searchParams); // get only the first page of transactions
   return fetchWithErrorHandling(transactionsUrl);
 }
 
-const TransactionsPage = async ({ params }: { params: Promise<TransactionsPageProps> }) => {
+
+const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps) => {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
+  const resolvedSearchParams = await searchParams;
   const t = await getTranslations('');
 
-  const transactions = await fetchTransactions();
+  const transactions = await fetchTransactions(resolvedSearchParams);
 
   return (
     <>
-      <TransactionsListView transactions={transactions} locale={locale} />
+      <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
     </>
   );
 };

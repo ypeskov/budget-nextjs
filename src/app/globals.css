@@ -48,7 +48,7 @@ body {
 }
 
 .list-item-container {
-  @apply flex justify-between text-2xl;
+  @apply flex justify-between text-xl;
 }
 
 .list-item-label {

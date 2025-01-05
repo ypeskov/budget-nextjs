@@ -4,13 +4,13 @@ import AccountDetails from "@/components/accounts/AccountDetails";
 import { Account } from "@/types/accounts";
 import { Transaction } from "@/types/transactions";
 import { getAuthToken } from "@/utils/auth";
+import { prepareRequestUrl } from "@/utils/transactions";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 interface RequestParams {
-  id: string;
-  locale: string;
+  params: Promise<{ id: string, locale : string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
 async function fetchWithErrorHandling(url: string): Promise<any> {
@@ -32,16 +32,16 @@ async function fetchAccount(id: number): Promise<Account> {
 }
 
 async function fetchTransactions(accountId: number): Promise<Transaction[]> {
-  const transactionsUrl = `${apiBaseUrl}/transactions/?accounts=${accountId}`
-    + `&per_page=${transactionsPerPage}`
-    + "&page=1";
+  const transactionsUrl = prepareRequestUrl(1, { accounts: String(accountId) });
   return fetchWithErrorHandling(transactionsUrl);
 }
 
-export default async function AccountDetailsPage({ params }: { params: Promise<RequestParams> }) {
+export default async function AccountDetailsPage({ params, searchParams }: RequestParams) {
   const resolvedParams = await params;
   const id = Number(resolvedParams.id);
   const locale = resolvedParams.locale;
+  const resolvedSearchParams = await searchParams;
+  resolvedSearchParams['accounts'] = String(id);
 
   let account: Account | undefined;
   let transactions: Transaction[] | undefined;
@@ -61,7 +61,7 @@ export default async function AccountDetailsPage({ params }: { params: Promise<R
   return (
     <>
       <AccountDetails account={account} locale={locale} />
-      <TransactionsListView transactions={transactions} locale={locale} accountId={id} />
+      <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
     </>
   );
 }
