@@ -120,10 +120,8 @@ export default function TransactionsListView({ transactions, locale, accountId }
                 <Link href={`/accountDetails/${trans.id}`} className="link-default link-hover">
                   <div className="list-item-container">
                     <div className="list-item-label">
-                      <div>{trans.label}</div>
-                      <div className="text-sm text-gray-500">
-                        {trans.category?.name || t('transfer')}
-                      </div>
+                      <div className="truncate">{trans.label}</div>
+                      <div className="text-sm text-gray-500">{trans.category?.name || t('transfer')}</div>
                     </div>
                     <div className={`text-right ${transactionColor(trans)}`}>
                       <div>
@@ -139,7 +137,8 @@ export default function TransactionsListView({ transactions, locale, accountId }
                       </div>
                       <div className="text-sm text-blue-500">
                         {trans.account.name}&nbsp;|&nbsp;
-                        <span className="text-sm text-green-500">{trans.newBalance.toLocaleString(locale, amountPrecision)}{' '}{trans.account.currency.code}</span>
+                        <span className="text-sm text-green-500">{trans.newBalance.toLocaleString(locale, amountPrecision)}&nbsp;
+                          {trans.account.currency.code}</span>
                       </div>
                     </div>
                   </div>
