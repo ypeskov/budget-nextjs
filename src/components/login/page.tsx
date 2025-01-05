@@ -20,7 +20,7 @@ export default function LoginPage({ locale }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { setUser } = useUser();
-  const t = useTranslations("LoginPage");
+  const t = useTranslations('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -9,14 +9,14 @@ import { getCookie } from '@/utils/cookies';
 interface TransactionsListViewProps {
   transactions: Transaction[];
   locale: string;
-  accountId: number;
+  accountId?: number;
 }
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 export default function TransactionsListView({ transactions, locale, accountId }: TransactionsListViewProps) {
-  const t = useTranslations("AccountDetailsPage");
+  const t = useTranslations('');
 
   const [transactionList, setTransactionList] = useState<Transaction[]>(transactions);
   const [loading, setLoading] = useState(false);
@@ -28,10 +28,11 @@ export default function TransactionsListView({ transactions, locale, accountId }
   
     setLoading(true);
     try {
-      const transactionsUrl = `${apiBaseUrl}/transactions/?accounts=${accountId}`
+      let transactionsUrl = `${apiBaseUrl}/transactions/?`
         + `&per_page=${transactionsPerPage}`
         + `&page=${page}`;
-  
+      if (accountId) transactionsUrl += `&accounts=${accountId}`
+
       const authToken = getCookie('authToken');
       const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
       const response = await fetch(transactionsUrl, { headers });
@@ -45,7 +46,7 @@ export default function TransactionsListView({ transactions, locale, accountId }
           const newTransactions = data.filter((t) => !ids.has(t.id));
           return [...prev, ...newTransactions];
         });
-        setPage((prev) => prev + 1); // Увеличиваем номер страницы
+        setPage((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Error loading more transactions:", error);
@@ -135,6 +136,10 @@ export default function TransactionsListView({ transactions, locale, accountId }
                           amountPrecision
                         )}{' '}
                         {trans.baseCurrencyCode})
+                      </div>
+                      <div className="text-sm text-blue-500">
+                        {trans.account.name}&nbsp;|&nbsp;
+                        <span className="text-sm text-green-500">{trans.newBalance.toLocaleString(locale, amountPrecision)}{' '}{trans.account.currency.code}</span>
                       </div>
                     </div>
                   </div>
