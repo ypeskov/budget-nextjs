@@ -52,7 +52,7 @@ body {
 }
 
 .list-item-label {
-  @apply truncate max-w-xs font-medium;
+  @apply truncate max-w-lg font-medium;
 }
 
 .link-default {
