@@ -13,52 +13,50 @@ interface RequestParams {
   locale: string;
 }
 
-async function fetchAccount(id: number): Promise<Account> {
-  const authToken = await getAuthToken();
-
-  const account: Account = await fetch(`${apiBaseUrl}/accounts/${id}`, {
-    headers: { "auth-token": authToken },
+async function fetchWithErrorHandling(url: string): Promise<any> {
+  const response = await fetch(url, {
+    headers: { "auth-token": await getAuthToken() },
     cache: "no-store",
-  })
-    .then((response) => response.json())
-    .catch((error) => {
-      console.error("Error fetching account details", error);
-      throw error;
-    });
+  });
 
-  return account;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
+  }
+
+  return response.json();
+}
+
+async function fetchAccount(id: number): Promise<Account> {
+  return fetchWithErrorHandling(`${apiBaseUrl}/accounts/${id}`);
 }
 
 async function fetchTransactions(accountId: number): Promise<Transaction[]> {
-  const authToken = await getAuthToken();
-
   const transactionsUrl = `${apiBaseUrl}/transactions/?accounts=${accountId}`
     + `&per_page=${transactionsPerPage}`
     + "&page=1";
-
-  const transactions = await fetch(transactionsUrl, {
-    headers: { "auth-token": authToken },
-    cache: "no-store",
-  })
-    .then((response) => response.json())
-    .catch((error) => {
-      console.error("Error fetching transactions", error);
-      throw error;
-    });
-
-  return transactions;
+  return fetchWithErrorHandling(transactionsUrl);
 }
 
 export default async function AccountDetailsPage({ params }: { params: Promise<RequestParams> }) {
   const resolvedParams = await params;
   const id = Number(resolvedParams.id);
   const locale = resolvedParams.locale;
-  
 
-  const [account, transactions] = await Promise.all([
-    fetchAccount(id),
-    fetchTransactions(id),
-  ]);
+  let account: Account | undefined;
+  let transactions: Transaction[] | undefined;
+  try {
+    [account, transactions] = await Promise.all([
+      fetchAccount(id),
+      fetchTransactions(id),
+    ]);
+  } catch (error) {
+    console.error("Error fetching account details and transactions", error);
+  }
+
+  if (!account || !transactions) {
+    return <div className="error-msg">Error loading account details</div>;
+  }
 
   return (
     <>
