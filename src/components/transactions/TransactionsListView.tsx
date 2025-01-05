@@ -5,17 +5,15 @@ import { Link } from '@/i18n/routing';
 import { Transaction } from '@/types/transactions';
 import { useTranslations } from 'next-intl';
 import { getCookie } from '@/utils/cookies';
+import { prepareRequestUrl } from '@/utils/transactions';
 
 interface TransactionsListViewProps {
   transactions: Transaction[];
   locale: string;
-  accountId?: number;
+  searchParams: Record<string, string | undefined>;
 }
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
-
-export default function TransactionsListView({ transactions, locale, accountId }: TransactionsListViewProps) {
+export default function TransactionsListView({ transactions, locale, searchParams }: TransactionsListViewProps) {
   const t = useTranslations('');
 
   const [transactionList, setTransactionList] = useState<Transaction[]>(transactions);
@@ -28,11 +26,7 @@ export default function TransactionsListView({ transactions, locale, accountId }
   
     setLoading(true);
     try {
-      let transactionsUrl = `${apiBaseUrl}/transactions/?`
-        + `&per_page=${transactionsPerPage}`
-        + `&page=${page}`;
-      if (accountId) transactionsUrl += `&accounts=${accountId}`
-
+      const transactionsUrl = prepareRequestUrl(page, searchParams);
       const authToken = getCookie('authToken');
       const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
       const response = await fetch(transactionsUrl, { headers });
@@ -53,7 +47,7 @@ export default function TransactionsListView({ transactions, locale, accountId }
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, page, accountId]);
+  }, [loading, hasMore, page, searchParams]);
 
   useEffect(() => {
     const handleScroll = () => {
