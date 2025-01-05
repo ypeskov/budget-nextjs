@@ -16,7 +16,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 export default function TransactionsListView({ transactions, locale, accountId }: TransactionsListViewProps) {
-  const t = useTranslations("AccountDetailsPage");
+  const t = useTranslations('');
 
   const [transactionList, setTransactionList] = useState<Transaction[]>(transactions);
   const [loading, setLoading] = useState(false);

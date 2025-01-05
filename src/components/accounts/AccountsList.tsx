@@ -13,7 +13,7 @@ export default function AccountsPageContainer({
   const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
   const availableBalanceCC = (acc: Account) => acc.balance + acc.creditLimit;
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balanceInBaseCurrency, 0);
-  const t = useTranslations("AccountsPage");
+  const t = useTranslations('');
 
   function accountAmmounts(acc: Account) {
     return (

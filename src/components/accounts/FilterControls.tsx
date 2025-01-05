@@ -11,7 +11,7 @@ export default function FilterControls({ locale }: { locale: string }) {
   const [includeHidden, setIncludeHidden] = useState(false);
   const [archivedOnly, setArchivedOnly] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const t = useTranslations("AccountsPage");
+  const t = useTranslations('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

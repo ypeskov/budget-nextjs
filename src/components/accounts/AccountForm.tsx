@@ -43,7 +43,7 @@ const getFormattedNumber = (value: number, locale: string): string => {
 
 const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) => {
   const router = useRouter();
-  const t = useTranslations("AccountDetailsPage");
+  const t = useTranslations('');
 
   const formattedBalance = account?.balance ? getFormattedNumber(account.balance, locale) : "0.00";
   const formattedCreditLimit = account?.creditLimit ? getFormattedNumber(account.creditLimit, locale) : "0.00";
