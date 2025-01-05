@@ -84,12 +84,10 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
   useEffect(() => {
     async function fetchData() {
       try {
-        const types: AccountType[] = await fetch(`${apiBaseUrl}/accounts/types/`, { headers }).then((res) =>
-          res.json()
-        );
-        const currencies = await fetch(`${apiBaseUrl}/currencies/`, { headers }).then((res) =>
-          res.json()
-        );
+        const types: AccountType[] = await fetch(`${apiBaseUrl}/accounts/types/`, { headers })
+          .then((res) => res.json());
+        const currencies = await fetch(`${apiBaseUrl}/currencies/`, { headers })
+          .then((res) => res.json());
         setAccountTypes(types);
         setCurrencies(currencies);
       } catch (error) {
@@ -172,9 +170,9 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
           <div className="mb-4">
             <label className="block text-sm font-medium">{t("name")}:</label>
             <input type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
           <div className="mb-4">
@@ -273,18 +271,11 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
               {t("showInReports")}
             </label>
           </div>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className="mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              onClick={() => closeForm()}
-            >
+          <div className="flex justify-between">
+            <button type="button" className="mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={() => closeForm()}>
               {t("cancel")}
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
+            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               {t("save")}
             </button>
           </div>
