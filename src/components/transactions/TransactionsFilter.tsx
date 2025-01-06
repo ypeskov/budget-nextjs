@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Account } from "@/types/accounts";
 
 interface TransactionsFilterProps {
-  accounts: string[];
+  accounts: Account[];
   locale: string;
   searchParams: Record<string, string | undefined>;
 }
@@ -15,7 +16,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
   const [types, setTypes] = useState<string[]>(() => searchParams.types?.split(",") || []);
   const [fromDate, setFromDate] = useState<string>(() => searchParams.fromDate || "");
   const [toDate, setToDate] = useState<string>(() => searchParams.toDate || "");
-  const [selectedAccounts, setSelectedAccounts] = useState<string[]>(() => searchParams.accounts?.split(",") || []);
+  const [selectedAccounts, setSelectedAccounts] = useState<number[]>(() => searchParams.accounts?.split(",").map(Number) || []);
 
   const toggleType = (type: string) => {
     setTypes((prev) =>
@@ -23,11 +24,11 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
     );
   };
 
-  const toggleAccount = (account: string) => {
+  const toggleAccount = (account: Account) => {
     setSelectedAccounts((prev) =>
-      prev.includes(account) ? prev.filter((a) => a !== account) : [...prev, account]
+      prev.includes(account.id) ? prev.filter((id) => id !== account.id) : [...prev, account.id]
     );
-  };
+  }
 
   const applyFilters = () => {
     const params = new URLSearchParams();
@@ -57,7 +58,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
         className={`overflow-hidden transition-all duration-300 ${isExpanded ? "max-h-screen" : "max-h-0"}`}
       >
         <div className="p-4 space-y-4">
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 justify-between">
             {["expense", "income", "transfer"].map((type) => (
               <label key={type} className="flex items-center space-x-2">
                 <input
@@ -71,7 +72,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
             ))}
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 justify-between">
             <div className="flex flex-col">
               <label htmlFor="fromDate" className="mb-1 text-sm text-gray-600">From</label>
               <input
@@ -98,14 +99,14 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
             <h4 className="mb-2 text-sm text-gray-600">Accounts</h4>
             <div className="grid grid-cols-2 gap-2">
               {accounts.map((account) => (
-                <label key={account} className="flex items-center space-x-2">
+                <label key={account.id} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={selectedAccounts.includes(account)}
+                    checked={selectedAccounts.includes(account.id)}
                     onChange={() => toggleAccount(account)}
                     className="rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <span className="text-gray-700">{account}</span>
+                  <span className="text-gray-700">{account.name}</span>
                 </label>
               ))}
             </div>

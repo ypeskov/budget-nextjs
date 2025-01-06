@@ -4,11 +4,14 @@ import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
 import { prepareRequestUrl } from '@/utils/transactions';
 import TransactionsFilter from '@/components/transactions/TransactionsFilter';
+import { Account } from '@/types/accounts';
 
 interface TransactionsPageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | undefined>>;
 }
+
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 async function fetchWithErrorHandling(url: string): Promise<any> {
   const response = await fetch(url, {
@@ -30,6 +33,10 @@ async function fetchTransactions(searchParams: Record<string, string | undefined
   return fetchWithErrorHandling(transactionsUrl);
 }
 
+async function fetchAccounts(): Promise<Account[]> {
+  const accountsUrl = `${apiBaseUrl}/accounts?includeHidden=true`;
+  return fetchWithErrorHandling(accountsUrl);
+}
 
 const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps) => {
   const resolvedParams = await params;
@@ -39,7 +46,7 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
 
   const transactions = await fetchTransactions(resolvedSearchParams);
 
-  const accounts: string[] = [17, 18, 19, 20, 21, 22, 23, 24, 25, 26].map(String);
+  const accounts = await fetchAccounts();
 
   return (
     <>
