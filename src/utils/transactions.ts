@@ -18,6 +18,10 @@ export function prepareRequestUrl(page: number, searchParams: Record<string, str
     transactionsUrl += `&from_date=${searchParams.fromDate}`;
   }
 
+  if (searchParams.toDate) {
+    transactionsUrl += `&to_date=${searchParams.toDate}`;
+  }
+
   // console.log(transactionsUrl);
   return transactionsUrl;
 }
