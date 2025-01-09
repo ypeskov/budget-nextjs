@@ -8,6 +8,7 @@ import { useState } from "react";
 import AccountForm from "@/components/accounts/AccountForm";
 import { getCookie } from "@/utils/cookies";
 import { useRouter } from "next/navigation";
+import { formatAmount } from "@/utils/amount";
 
 interface AccountDetailsProps {
   account: Account;
@@ -24,12 +25,16 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
   const router = useRouter();
 
   const formattedBalance = account.balance
-    ? account.balance.toLocaleString(locale, {
-      style: "decimal",
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2,
-    })
-    : "0.00";
+    ? formatAmount(account.balance, locale, account.currency.code) : "0.00";
+
+  let formattedCreditLimit = "0.00";
+  if (account.accountTypeId === CREDIT_CARD_ACCOUNT_TYPE_ID) {
+    formattedCreditLimit = 
+      formatAmount(account.creditLimit + account.balance, 
+        locale, 
+        account.currency.code,
+        'decimal');
+  }
 
   const toggleEditForm = () => {
     setShowEditForm(!showEditForm);
@@ -88,9 +93,8 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
           <span>
             {t('balance')}: <b>{formattedBalance}</b>
             {account.accountTypeId === CREDIT_CARD_ACCOUNT_TYPE_ID && (
-              <span>({availableBalanceCC})</span>
+              <span>({formattedCreditLimit})</span>
             )}
-            &nbsp;{account?.currency?.code}
           </span>
           <button className="text-red-500">
             <img
