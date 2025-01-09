@@ -1,15 +1,15 @@
-import { DateTime } from "luxon";
 import TransactionsListView from "@/components/transactions/TransactionsListView";
 import AccountDetails from "@/components/accounts/AccountDetails";
 import { Account } from "@/types/accounts";
 import { Transaction } from "@/types/transactions";
 import { getAuthToken } from "@/utils/auth";
 import { prepareRequestUrl } from "@/utils/transactions";
+import TransactionsFilter from '@/components/transactions/TransactionsFilter';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface RequestParams {
-  params: Promise<{ id: string, locale : string }>;
+  params: Promise<{ id: string, locale: string }>;
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
@@ -21,6 +21,7 @@ async function fetchWithErrorHandling(url: string): Promise<any> {
 
   if (!response.ok) {
     const error = await response.json();
+    console.error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
     throw new Error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
   }
 
@@ -61,6 +62,11 @@ export default async function AccountDetailsPage({ params, searchParams }: Reque
   return (
     <>
       <AccountDetails account={account} locale={locale} />
+
+      <div className="mt-4 mb-4">
+        <TransactionsFilter accounts={[account]} locale={locale} searchParams={resolvedSearchParams} />
+      </div>
+
       <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
     </>
   );

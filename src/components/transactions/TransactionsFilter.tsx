@@ -7,10 +7,12 @@ interface TransactionsFilterProps {
   accounts: Account[];
   locale: string;
   searchParams: Record<string, string | undefined>;
+  isAccountDetailsPage?: boolean;
 }
 
-const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilterProps) => {
+const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPage }: TransactionsFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  isAccountDetailsPage = isAccountDetailsPage || false;
 
   // State initialization for filters
   const [types, setTypes] = useState<string[]>(() => searchParams.types?.split(",") || []);
@@ -38,7 +40,13 @@ const TransactionsFilter = ({ accounts, locale, searchParams }: TransactionsFilt
     if (toDate) params.set("toDate", toDate);
     if (selectedAccounts.length > 0) params.set("accounts", selectedAccounts.join(","));
 
-    const newUrl = `/${locale}/transactions/?${params.toString()}`;
+    let newUrl;
+    if (isAccountDetailsPage) {
+      newUrl = `/${locale}/accountDetails/${selectedAccounts[0]}/?${params.toString()}`;
+      window.location.href = newUrl;
+      return;
+    }
+    newUrl = `/${locale}/transactions/?${params.toString()}`;
     window.location.href = newUrl;
   };
 
