@@ -15,7 +15,6 @@ interface LoginPageProps {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-console.log(API_URL);
 
 export default function LoginPage({ locale }: LoginPageProps) {
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });

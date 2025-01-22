@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Account } from "@/types/accounts";
 
 interface TransactionsFilterProps {
@@ -20,6 +20,14 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
   const [toDate, setToDate] = useState<string>(() => searchParams.toDate || "");
   const [selectedAccounts, setSelectedAccounts] = useState<number[]>(() => searchParams.accounts?.split(",").map(Number) || []);
 
+
+  useEffect(() => {
+    setTypes(searchParams.types?.split(",") || []);
+    setFromDate(searchParams.fromDate || "");
+    setToDate(searchParams.toDate || "");
+    setSelectedAccounts(searchParams.accounts?.split(",").map(Number) || []);
+  }, [searchParams]);
+
   const toggleType = (type: string) => {
     setTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
@@ -33,7 +41,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
   }
 
   const applyFilters = () => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(window.location.search);
 
     if (types.length > 0) params.set("types", types.join(","));
     if (fromDate) params.set("fromDate", fromDate);
