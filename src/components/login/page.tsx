@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import { jwtVerify } from "jose";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useUser } from "@/context/UserContext";
@@ -15,12 +14,15 @@ interface LoginPageProps {
   locale: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+console.log(API_URL);
+
 export default function LoginPage({ locale }: LoginPageProps) {
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { setUser } = useUser();
   const t = useTranslations('');
+  const { setUser } = useUser();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,7 +36,7 @@ export default function LoginPage({ locale }: LoginPageProps) {
     e.preventDefault();
     setError(null);
     try {
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,12 +47,19 @@ export default function LoginPage({ locale }: LoginPageProps) {
       if (response.ok) {
         const data: { accessToken: string } = await response.json();
         document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`;
+        const userResponse = await fetch(`${API_URL}/auth/profile`, {
+          headers: {
+            "auth-token": data.accessToken,
+          },
+        });
+  
+        if (userResponse.ok) {
+          const response = await userResponse.json(); 
+          setUser({ email: response.email, token: data.accessToken });
+        } else {
+          console.error("Failed to fetch user profile after login");
+        }
 
-        const secretKey = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET_KEY || "your-secret-key");
-        const { payload } = await jwtVerify(data.accessToken, secretKey);
-        const decoded = payload as { email: string };
-
-        setUser({ email: decoded.email, token: data.accessToken });
         router.push(`/${locale}/accounts`);
       } else {
         const errorData: { message: string } = await response.json();

@@ -41,5 +41,14 @@
     "category": "Категорія",
     "deleteTransaction": "Видалити транзакцію",
     "editTransaction": "Редагувати транзакцію",
-    "deleteTransactionConfirmation": "Ви впевнені, що хочете видалити цю транзакцію?"
+    "deleteTransactionConfirmation": "Ви впевнені, що хочете видалити цю транзакцію?",
+    "cashFlowReport": "Звіт по грошовому потоку",
+    "balanceReport": "Звіт по балансу",
+    "expensesReport": "Звіт по витратах",
+    "startDate": "Дата початку",
+    "endDate": "Дата закінчення",
+    "hideEmptyCategories": "Сховати порожні категорії",
+    "loadingDiagram": "Завантаження діаграми",
+    "noData": "Немає даних",
+    "totalExpenses": "Загальні витрати"
 }

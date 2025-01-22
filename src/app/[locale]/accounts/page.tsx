@@ -19,11 +19,6 @@ export default async function AccountsPage({
   const awaitedSearchParams = await searchParams;
   const cookieStore = await cookies();
   const authToken = cookieStore.get('authToken')?.value || '';
-
-  if (!authToken) {
-    return <UnauthorizedMsg />;
-  }
-
   const includeHidden = awaitedSearchParams.includeHidden === "true";
   const includeArchived = awaitedSearchParams.includeArchived === "true";
   const archivedOnly = awaitedSearchParams.archivedOnly === "true";
@@ -50,14 +45,14 @@ export default async function AccountsPage({
     return <div className="text-center text-red-500 text-3xl">{error}</div>;
   }
 
-  const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
+  // const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
 
-  const availableBalanceCC = (acc: Account) => acc.balance + acc.creditLimit;
+  // const availableBalanceCC = (acc: Account) => acc.balance + acc.creditLimit;
 
-  const amountPrecision = {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  };
+  // const amountPrecision = {
+  //   minimumFractionDigits: 2,
+  //   maximumFractionDigits: 2
+  // };
 
   const accounts: Accounts = await accountsResponse.json();
   const baseCurrency: BaseCurrency = await baseCurrencyResponse.json();
@@ -65,7 +60,7 @@ export default async function AccountsPage({
   return (
     <>
       <FilterControls locale={locale} />
-      <AccountsList accounts={accounts} baseCurrency={baseCurrency} />
+      <AccountsList accounts={accounts} baseCurrency={baseCurrency} locale={locale} />
     </>
   );
 }

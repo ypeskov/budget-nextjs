@@ -1,7 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState, useEffect } from "react";
-import { jwtVerify } from "jose";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 interface User {
   email: string | null;
@@ -13,36 +12,58 @@ interface UserContextType {
   setUser: (user: User) => void;
 }
 
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY || 'your-secret-key');
-
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType>({
+  user: { email: null, token: null },
+  setUser: () => {},
+});
+const defaultUser: User = { email: null, token: null };
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User>({ email: null, token: null });
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUserProfile = async () => {
       const token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("authToken="))
         ?.split("=")[1];
 
-      if (token) {
-        try {
-          const { payload } = await jwtVerify(token, SECRET_KEY);
-          const decoded = payload as { email: string };
-          setUser({ email: decoded.email, token });
-        } catch (error) {
-          console.error("Invalid token", error);
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        const userResponse = await fetch(`${API_URL}/auth/profile`, {
+          headers: {
+            "auth-token": token,
+          },
+        });
+
+        if (userResponse.ok) {
+          const response = await userResponse.json();
+          setUser({ email: response.email, token });
+        } else {
+          console.error("Failed to fetch user profile");
+          setUser(null);
         }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        setUser(null);
       }
     };
 
-    loadUser();
+    loadUserProfile();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{
+        user: user || defaultUser,
+        setUser,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
