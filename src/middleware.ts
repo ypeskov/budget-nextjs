@@ -9,7 +9,6 @@ const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY || 'your-
 async function isTokenValid(token: string): Promise<boolean> {
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    // console.log('Payload:', payload);
     return true;
   } catch (err) {
     console.error('JWT validation failed', err);
@@ -30,9 +29,9 @@ async function authMiddleware(req: NextRequest): Promise<NextResponse | null> {
   const localeMatch = new RegExp(`^\\/(${routing.locales.join('|')})(\\/|$)`).exec(pathname);
   const locale = localeMatch ? localeMatch[1] : null;
   const pathAfterLocale = localeMatch ? pathname.slice(localeMatch[0].length) : '';
-
-  const isUnprotected = unprotectedPaths.some((path) => path === pathAfterLocale);
-
+  
+  const isUnprotected = unprotectedPaths.some((path) => pathAfterLocale.startsWith(path));
+  
   if (isRootPath || isUnprotected) {
     return null; // Skip token validation for root and unprotected paths
   }
@@ -48,6 +47,7 @@ async function authMiddleware(req: NextRequest): Promise<NextResponse | null> {
 
 export default async function middleware(req: NextRequest) {
   const authResult = await authMiddleware(req);
+
   if (authResult) {
     return authResult;
   }
@@ -62,5 +62,12 @@ export const config = {
 
 const unprotectedPaths = [
   'login', 
+  'logout',
   'register',
+  'installHook.js.map',
+  'favicon.ico',
+  'manifest.json',
+  'robots.txt',
+  'sitemap.xml',
+  'favicon.ico'
 ];

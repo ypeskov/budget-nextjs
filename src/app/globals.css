@@ -43,8 +43,14 @@ body {
   @apply bg-[var(--card-bg)] rounded-lg shadow p-4 transition m-2;
 }
 
-.list-item:hover {
-  @apply bg-[var(--card-hover-bg)] shadow-md;
+.menu-item {
+  @apply rounded-lg shadow p-4 transition m-2;
+  background-color: lightgray;
+}
+
+.menu-item:hover {
+  @apply shadow-md;
+  background-color: lightblue;
 }
 
 .list-item-container {
