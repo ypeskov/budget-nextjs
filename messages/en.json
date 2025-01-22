@@ -50,5 +50,13 @@
     "hideEmptyCategories": "Hide empty categories",
     "loadingDiagram": "Loading diagram",
     "noData": "No data",
-    "totalExpenses": "Total expenses"
+    "totalExpenses": "Total expenses",
+    "applyFilters": "Apply",
+    "clearFilters": "Clear",
+    "filterTransactions": "Filter transactions",
+    "expense": "Expense",
+    "income": "Income",
+    "from": "From",
+    "to": "To",
+    "accounts": "Accounts"
 }

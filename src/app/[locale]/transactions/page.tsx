@@ -42,7 +42,6 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
   const resolvedSearchParams = await searchParams;
-  const t = await getTranslations('');
 
   const transactions = await fetchTransactions(resolvedSearchParams);
   const accounts = await fetchAccounts();

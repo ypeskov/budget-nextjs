@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Account } from "@/types/accounts";
+import { useTranslations } from "next-intl";
 
 interface TransactionsFilterProps {
   accounts: Account[];
@@ -13,7 +14,7 @@ interface TransactionsFilterProps {
 const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPage }: TransactionsFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   isAccountDetailsPage = isAccountDetailsPage || false;
-
+  const t = useTranslations('');
   // State initialization for filters
   const [types, setTypes] = useState<string[]>(() => searchParams.types?.split(",") || []);
   const [fromDate, setFromDate] = useState<string>(() => searchParams.fromDate || "");
@@ -41,7 +42,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
   }
 
   const applyFilters = () => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams();
 
     if (types.length > 0) params.set("types", types.join(","));
     if (fromDate) params.set("fromDate", fromDate);
@@ -58,13 +59,22 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
     window.location.href = newUrl;
   };
 
+  const clearFilters = () => {
+    setTypes([]);
+    setFromDate("");
+    setToDate("");
+    setSelectedAccounts([]);
+    const newUrl = `/${locale}/transactions/`;
+    window.location.href = newUrl;
+  };
+
   return (
     <div className="info-card relative w-full">
       <div
         className="bg-blue-600 text-white p-4 cursor-pointer flex items-center justify-between"
         onClick={() => setIsExpanded((prev) => !prev)}
       >
-        <span className="font-bold text-lg">Filter Transactions</span>
+        <span className="font-bold text-lg">{t('filterTransactions')}</span>
         <span className={`transition-transform ${isExpanded ? "rotate-180" : "rotate-0"}`}>
           ▼
         </span>
@@ -75,7 +85,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
       >
         <div className="p-4 space-y-4">
           <div className="flex space-x-4 justify-between">
-            {["expense", "income", "transfer"].map((type) => (
+            {[t('expense'), t('income'), t('transfer')].map((type) => (
               <label key={type} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -90,7 +100,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
 
           <div className="flex space-x-4 justify-between">
             <div className="flex flex-col">
-              <label htmlFor="fromDate" className="mb-1 text-sm text-gray-600">From</label>
+              <label htmlFor="fromDate" className="mb-1 text-sm text-gray-600">{t('from')}</label>
               <input
                 type="date"
                 id="fromDate"
@@ -100,7 +110,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
               />
             </div>
             <div className="flex flex-col">
-              <label htmlFor="toDate" className="mb-1 text-sm text-gray-600">To</label>
+              <label htmlFor="toDate" className="mb-1 text-sm text-gray-600">{t('to')}</label>
               <input
                 type="date"
                 id="toDate"
@@ -112,7 +122,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
           </div>
 
           <div>
-            <h4 className="mb-2 text-sm text-gray-600">Accounts</h4>
+            <h4 className="mb-2 text-sm text-gray-600">{t('accounts')}</h4>
             <div className="grid grid-cols-2 gap-2">
               {accounts.map((account) => (
                 <label key={account.id} className="flex items-center space-x-2">
@@ -128,12 +138,20 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
             </div>
           </div>
 
-          <button
-            onClick={applyFilters}
-            className="w-full rounded bg-blue-500 p-2 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            Apply Filters
-          </button>
+          <div className="flex space-x-4 justify-between">
+            <button
+              onClick={applyFilters}
+              className="w-full rounded bg-blue-500 p-2 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              {t('applyFilters')}
+            </button>
+            <button
+              onClick={clearFilters}
+              className="w-full rounded bg-red-500 p-2 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
+            >
+              {t('clearFilters')}
+            </button>
+          </div>
         </div>
       </div>
     </div>
