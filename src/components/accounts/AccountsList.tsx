@@ -2,6 +2,7 @@ import { Link } from '@/i18n/routing';
 import { Account, BaseCurrency, Accounts } from '@/types/accounts';
 import { useTranslations } from 'next-intl';
 import { CREDIT_CARD_ACCOUNT_TYPE_ID } from '@/constants';
+import AccountArchived from './accountArchived';
 
 type AccountsPageContainerProps = {
   accounts: Accounts;
@@ -31,7 +32,6 @@ export default function AccountsPageContainer({
           )}
           {' '}
           {acc.currency.code}
-
         </div>
         <div className="text-gray-500">
           ({acc.balanceInBaseCurrency.toLocaleString(locale, amountPrecision)} {baseCurrency.code || 'N/A'})
@@ -59,10 +59,24 @@ export default function AccountsPageContainer({
           <li key={acc.id} className="list-item">
             <Link href={`/accountDetails/${acc.id}`} className="link-default link-hover">
               <div className="list-item-container">
-                <div className="list-item-label">{acc.name}</div>
+                <div className="list-item-label">
+                  <div className="font-bold">{acc.name}</div>
+                  <div className="text-gray-500">
+                    {acc.archivedAt && (
+                      <span>
+                        {t('archived')}: {new Intl.DateTimeFormat(locale || 'en', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        }).format(new Date(acc.archivedAt))}
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <div className={`text-right ${balanceClass(acc.balance)}`}>
                   {accountAmmounts(acc)}
                 </div>
+                {acc.isArchived && <AccountArchived account={acc} />}
               </div>
             </Link>
           </li>

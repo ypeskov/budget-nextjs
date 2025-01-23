@@ -1,11 +1,13 @@
 import { cookies } from 'next/headers';
-import { Account, BaseCurrency, Accounts } from '@/types/accounts';
+import { BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 import FilterControls from "@/components/accounts/FilterControls";
 
 function UnauthorizedMsg() {
   return <div className="text-center text-red-500 text-3xl">Unauthorized</div>;
 }
+
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default async function AccountsPage({
   searchParams,
@@ -23,9 +25,6 @@ export default async function AccountsPage({
   const includeArchived = awaitedSearchParams.includeArchived === "true";
   const archivedOnly = awaitedSearchParams.archivedOnly === "true";
 
-  let error = null;
-  
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   const accountsUrl = `${apiBaseUrl}/accounts/?includeHidden=${includeHidden}` +
     `&includeArchived=${includeArchived}` +
     `&archivedOnly=${archivedOnly}`;
@@ -44,15 +43,6 @@ export default async function AccountsPage({
     const error = 'Some error occurred while fetching data';
     return <div className="text-center text-red-500 text-3xl">{error}</div>;
   }
-
-  // const balanceClass = (balance: number) => (balance < 0 ? 'text-red-500' : 'text-green-500');
-
-  // const availableBalanceCC = (acc: Account) => acc.balance + acc.creditLimit;
-
-  // const amountPrecision = {
-  //   minimumFractionDigits: 2,
-  //   maximumFractionDigits: 2
-  // };
 
   const accounts: Accounts = await accountsResponse.json();
   const baseCurrency: BaseCurrency = await baseCurrencyResponse.json();

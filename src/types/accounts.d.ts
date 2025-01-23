@@ -22,6 +22,7 @@ export interface Account {
     is_credit: boolean;
   };
   isDeleted: boolean;
+  isArchived: boolean;
   balanceInBaseCurrency: number;
   archivedAt: string;
 }

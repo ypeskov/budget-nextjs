@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server';
 import TransactionsListView from '@/components/transactions/TransactionsListView';
 import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
@@ -21,7 +20,6 @@ async function fetchWithErrorHandling(url: string): Promise<any> {
 
   if (!response.ok) {
     const error = await response.json();
-    console.log(error.detail);
     throw new Error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
   }
 
@@ -30,7 +28,8 @@ async function fetchWithErrorHandling(url: string): Promise<any> {
 
 async function fetchTransactions(searchParams: Record<string, string | undefined>): Promise<Transaction[]> {
   const transactionsUrl = prepareRequestUrl(1, searchParams); // get only the first page of transactions
-  return fetchWithErrorHandling(transactionsUrl);
+  const transactions = await fetchWithErrorHandling(transactionsUrl);
+  return transactions;
 }
 
 async function fetchAccounts(): Promise<Account[]> {
@@ -42,10 +41,8 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
   const resolvedSearchParams = await searchParams;
-  const t = await getTranslations('');
 
   const transactions = await fetchTransactions(resolvedSearchParams);
-
   const accounts = await fetchAccounts();
 
   return (

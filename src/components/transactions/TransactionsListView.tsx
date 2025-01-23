@@ -15,7 +15,6 @@ interface TransactionsListViewProps {
 
 export default function TransactionsListView({ transactions, locale, searchParams }: TransactionsListViewProps) {
   const t = useTranslations('');
-
   const [transactionList, setTransactionList] = useState<Transaction[]>(transactions);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(2);

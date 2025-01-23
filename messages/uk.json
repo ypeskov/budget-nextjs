@@ -50,5 +50,15 @@
     "hideEmptyCategories": "Сховати порожні категорії",
     "loadingDiagram": "Завантаження діаграми",
     "noData": "Немає даних",
-    "totalExpenses": "Загальні витрати"
+    "totalExpenses": "Загальні витрати",
+    "applyFilters": "Застосувати",
+    "clearFilters": "Очистити",
+    "filterTransactions": "Фільтр транзакцій",
+    "expense": "Витрата",
+    "income": "Дохід",
+    "from": "З",
+    "to": "До",
+    "accounts": "Рахунки",
+    "archived": "Архівований",
+    "restore": "Відновити"
 }
