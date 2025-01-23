@@ -305,9 +305,11 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               {t("save")}
             </button>
-            <button type="button" className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onClick={() => setShowConfirmPopupArchive(true)}>
-              {t("archive")}
-            </button>
+            {account?.id && (
+              <button type="button" className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onClick={() => setShowConfirmPopupArchive(true)}>
+                {t("archive")}
+              </button>
+            )}
           </div>
         </form>
       </div>

@@ -85,7 +85,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
       >
         <div className="p-4 space-y-4">
           <div className="flex space-x-4 justify-between">
-            {[t('expense'), t('income'), t('transfer')].map((type) => (
+            {['expense', 'income', 'transfer'].map((type) => (
               <label key={type} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -93,7 +93,7 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
                   onChange={() => toggleType(type)}
                   className="rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <span className="capitalize text-gray-700">{type}</span>
+                <span className="capitalize text-gray-700">{t(`${type}`)}</span>
               </label>
             ))}
           </div>
