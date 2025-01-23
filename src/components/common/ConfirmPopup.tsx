@@ -3,8 +3,8 @@ interface ConfirmPopupProps {
   message: string;
   cancelButtonText: string;
   confirmButtonText: string;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onCancel: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ConfirmPopup = ({ title, message, cancelButtonText, confirmButtonText, onConfirm, onCancel }: ConfirmPopupProps) => {
