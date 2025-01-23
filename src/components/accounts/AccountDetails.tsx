@@ -9,6 +9,7 @@ import AccountForm from "@/components/accounts/AccountForm";
 import { getCookie } from "@/utils/cookies";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/utils/amount";
+import ConfirmPopup from "../common/ConfirmPopup";
 
 interface AccountDetailsProps {
   account: Account;
@@ -29,9 +30,9 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
 
   let formattedCreditLimit = "0.00";
   if (account.accountTypeId === CREDIT_CARD_ACCOUNT_TYPE_ID) {
-    formattedCreditLimit = 
-      formatAmount(account.creditLimit + account.balance, 
-        locale, 
+    formattedCreditLimit =
+      formatAmount(account.creditLimit + account.balance,
+        locale,
         account.currency.code,
         'decimal');
   }
@@ -67,6 +68,10 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
       });
   };
 
+  const confirmArchive = () => {
+    console.log('confirmArchive');
+  }
+
   const cancelDelete = () => {
     setShowConfirmPopup(false); // Close the delete confirmation popup
   };
@@ -85,7 +90,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
               onClick={toggleEditForm}
               width="24"
               height="24"
-              title={t('editAccount')}/>
+              title={t('editAccount')} />
           </button>
         </div>
 
@@ -118,16 +123,14 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
 
       {/* Delete Confirmation Popup */}
       {showConfirmPopup && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-80">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{t('confirmDelete')}</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{t('deleteAccountConfirmation')}</p>
-            <div className="flex justify-between space-x-4 mt-4">
-              <button onClick={cancelDelete} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">{t('cancel')}</button>
-              <button onClick={confirmDelete} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">{t('confirm')}</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmPopup
+          title={t('deleteAccount')}
+          message={t('deleteAccountConfirmation')}
+          cancelButtonText={t('cancel')}
+          confirmButtonText={t('confirm')}
+          onConfirm={confirmArchive}
+          onCancel={cancelDelete}
+        />
       )}
     </>
   );
