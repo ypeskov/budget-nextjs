@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server';
 import TransactionsListView from '@/components/transactions/TransactionsListView';
 import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';

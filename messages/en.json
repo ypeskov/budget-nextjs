@@ -58,5 +58,7 @@
     "income": "Income",
     "from": "From",
     "to": "To",
-    "accounts": "Accounts"
+    "accounts": "Accounts",
+    "archived": "Archived",
+    "restore": "Restore"
 }

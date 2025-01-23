@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { Account, BaseCurrency, Accounts } from '@/types/accounts';
+import { BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 import FilterControls from "@/components/accounts/FilterControls";
 
@@ -19,7 +19,6 @@ export default async function AccountsPage({
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
   const awaitedSearchParams = await searchParams;
-  console.log(awaitedSearchParams);
   const cookieStore = await cookies();
   const authToken = cookieStore.get('authToken')?.value || '';
   const includeHidden = awaitedSearchParams.includeHidden === "true";
