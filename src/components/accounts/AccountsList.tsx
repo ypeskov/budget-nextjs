@@ -62,7 +62,7 @@ export default function AccountsPageContainer({
                 <div className="list-item-label">
                   <div className="font-bold">{acc.name}</div>
                   <div className="text-gray-500">
-                    {acc.archivedAt && (
+                    {acc.isArchived && (
                       <span>
                         {t('archived')}: {new Intl.DateTimeFormat(locale || 'en', {
                           year: 'numeric',

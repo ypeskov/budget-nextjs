@@ -60,5 +60,8 @@
     "to": "To",
     "accounts": "Accounts",
     "archived": "Archived",
-    "restore": "Restore"
+    "restore": "Restore",
+    "archive": "Archive",
+    "confirmArchive": "Confirm archive",
+    "confirmArchiveMessage": "Are you sure you want to archive this account?"
 }

@@ -6,6 +6,8 @@ import { DateTime } from "luxon";
 import { Account } from "@/types/accounts";
 import { getCookie } from "@/utils/cookies";
 import { useTranslations } from "next-intl";
+import routes from "@/routes/routes"; 
+import ConfirmPopup from "../common/ConfirmPopup";
 
 interface EditAccountProps {
   account?: Account;
@@ -64,7 +66,7 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
   const [showInReports, setShowInReports] = useState<boolean>(false);
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
   const [currencies, setCurrencies] = useState([]);
-
+  const [showConfirmPopupArchive, setShowConfirmPopupArchive] = useState(false);
   const authToken = getCookie("authToken");
   const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
 
@@ -149,6 +151,31 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
       setError(t('addError'));
     }
   };
+
+  const confirmArchive = async () => {
+    const headers = {
+      ...(authToken && { "auth-token": authToken }),
+      "Content-Type": "application/json",
+    };
+    const response = await fetch(`${apiBaseUrl}/accounts/set-archive-status`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        accountId: account?.id,
+        isArchived: true
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to archive account: ${response.statusText}`);
+    }
+    router.push(routes.accounts(locale, true, false, true));
+  }
+
+  const cancelArchive = () => {
+    setShowConfirmPopupArchive(false);
+  }
+
 
   return (
     <div
@@ -278,9 +305,23 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               {t("save")}
             </button>
+            <button type="button" className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onClick={() => setShowConfirmPopupArchive(true)}>
+              {t("archive")}
+            </button>
           </div>
         </form>
       </div>
+
+      {showConfirmPopupArchive && (
+        <ConfirmPopup
+          title={t('confirmArchive')}
+          message={t('confirmArchiveMessage')}
+          cancelButtonText={t('cancel')}
+          confirmButtonText={t('confirm')}
+          onConfirm={confirmArchive}
+          onCancel={cancelArchive}
+        />
+      )}
     </div>
   );
 };
