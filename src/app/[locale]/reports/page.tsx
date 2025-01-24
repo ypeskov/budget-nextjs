@@ -1,29 +1,32 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
+import routes from "@/routes/routes";
 
 type ReportsPageProps = {
-  locale: string;
+  params: Promise<Record<string, string | undefined>>;
 }
 
-export default function ReportsPage({ locale }: ReportsPageProps) {
-  const t = useTranslations('');
+export default async function ReportsPage({ params }: ReportsPageProps) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale || 'en';
+  const t = await getTranslations('');
 
 
   return (
     <>
       <div>
         <ul className="space-y-4">
-        <li className="menu-item">
-            <Link href="/reports/cash-flow" className="link-default link-hover text-xl">{t('cashFlowReport')}</Link>
-          </li>
-          <li className="menu-item">
-            <Link href="/reports/balance" className="link-default link-hover text-xl">{t('balanceReport')}</Link>
-          </li>
-          <li className="menu-item">
-            <Link href="/reports/expenses-report" className="link-default link-hover text-xl">{t('expensesReport')}</Link>
-          </li>
+          <Link href={routes.cashFlowReport(locale)}>
+            <li className="menu-item text-xl">{t('cashFlowReport')}</li>
+          </Link>
+          <Link href={routes.balanceReport(locale)}>
+            <li className="menu-item text-xl">{t('balanceReport')}</li>
+          </Link>
+          <Link href={routes.expensesReport()}>
+            <li className="menu-item text-xl">{t('expensesReport')}</li>
+          </Link>
         </ul>
       </div>
     </>
-    )
+  )
 }

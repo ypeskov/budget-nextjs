@@ -18,6 +18,22 @@ export default {
 
   settings: (locale: string) => `/${locale}/settings`,
 
-  expensesReport: (locale: string, fromDate: string, toDate: string, hideEmptyCategories: string) => 
-    `/${locale}/reports/expenses-report?fromDate=${fromDate}&toDate=${toDate}&hideEmptyCategories=${hideEmptyCategories}`,
+  expensesReport: (locale?: string, fromDate?: string, toDate?: string, hideEmptyCategories?: string) => {
+    const params = new URLSearchParams();
+    if (fromDate) params.append('fromDate', fromDate);
+    if (toDate) params.append('toDate', toDate);
+    if (hideEmptyCategories) params.append('hideEmptyCategories', hideEmptyCategories);
+    
+    let url = '/reports/expenses-report';
+    if (locale) {
+      url = `/${locale}${url}`;
+    }
+    const queryString = params.toString();
+    return `${url}${queryString ? `?${queryString}` : ''}`;
+  },
+
+  cashFlowReport: (locale: string) => `/${locale}/reports/cash-flow`,
+
+  balanceReport: (locale: string) => `/${locale}/reports/balance`,
+
 };
