@@ -2,24 +2,19 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import routes from "@/routes/routes";
 
-type ReportsPageProps = {
-  params: Promise<Record<string, string | undefined>>;
-}
+type ReportsPageProps = {}
 
-export default async function ReportsPage({ params }: ReportsPageProps) {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale || 'en';
+export default async function ReportsPage() {
   const t = await getTranslations('');
-
 
   return (
     <>
       <div>
         <ul className="space-y-4">
-          <Link href={routes.cashFlowReport(locale)}>
+          <Link href={routes.cashFlowReport()}>
             <li className="menu-item text-xl">{t('cashFlowReport')}</li>
           </Link>
-          <Link href={routes.balanceReport(locale)}>
+          <Link href={routes.balanceReport()}>
             <li className="menu-item text-xl">{t('balanceReport')}</li>
           </Link>
           <Link href={routes.expensesReport()}>

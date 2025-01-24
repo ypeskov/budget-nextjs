@@ -9,7 +9,12 @@ interface CategoriesExpensesProps {
 
 function calculateGroupTotal(expenses: CategoryExpense[], parentId: number | null): number {
   const children = expenses.filter((expense) => expense.parentId === parentId);
-  return children.reduce((sum, child) => sum + child.totalExpenses, 0);
+  const parentCategory = expenses.find((expense) => expense.id === parentId);
+
+  const childrenTotal = children.reduce((sum, child) => sum + child.totalExpenses, 0);
+  const parentTotal = parentCategory ? parentCategory.totalExpenses : 0;
+
+  return childrenTotal + parentTotal;
 }
 
 export default async function CategoriesExpenses({ expenses, locale = "en" }: CategoriesExpensesProps) {

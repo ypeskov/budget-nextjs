@@ -32,8 +32,20 @@ export default {
     return `${url}${queryString ? `?${queryString}` : ''}`;
   },
 
-  cashFlowReport: (locale: string) => `/${locale}/reports/cash-flow`,
+  cashFlowReport: (locale?: string) => {
+    let url = '/reports/cash-flow';
+    if (locale) {
+      url = `/${locale}${url}`;
+    }
+    return url;
+  },
 
-  balanceReport: (locale: string) => `/${locale}/reports/balance`,
+  balanceReport: (locale?: string) => {
+    let url = '/reports/balance';
+    if (locale) {
+      url = `/${locale}${url}`;
+    }
+    return url;
+  },
 
 };
