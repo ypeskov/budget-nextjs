@@ -1,55 +1,130 @@
-'use client'
-import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import Image from "next/image";
+import apiRoutes from "@/routes/apiRoutes";
+import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
+import AggregatedExpenses from "@/components/reports/expenses/AggregatedExpenses";
+import DatePicker from "@/components/reports/expenses/DatePicker";
+import CategoriesExpenses from "@/components/reports/expenses/CategoriesExpenses";
 
-export default function ExpensesReportPage() {
-  const t = useTranslations('');
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [hideEmptyCategories, setHideEmptyCategories] = useState(true);
-  const [pieDiagramUrl, setPieDiagramUrl] = useState("");
-  const [aggregatedCategories, setAggregatedCategories] = useState([]);
-  const [aggregatedSum, setAggregatedSum] = useState(0);
+interface ExpensesReportPageProps {
+  params: Promise<Record<string, string | undefined>>;
+  searchParams: Promise<Record<string, string | undefined>>;
+}
 
-  useEffect(() => {
-    // Mock function calls for fetching data
-    async function fetchData() {
-      // Fetch and set diagram URL, categories, and total sum
+const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, authToken: string) => {
+  const response = await fetch(apiRoutes.expenses(), {
+    method: 'POST',
+    body: JSON.stringify({
+      startDate: fromDate,
+      endDate: toDate,
+      hideEmptyCategories: hideEmptyCategories,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'auth-token': authToken,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    for (const key in error.detail) {
+      console.error(error.detail[key]);
     }
-    fetchData();
-  }, [startDate, endDate, hideEmptyCategories]);
+    return null;
+  }
+
+  return await response.json();
+}
+
+const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, authToken: string) => {
+  const response = await fetch(apiRoutes.expensesAggregate(), {
+    method: 'POST',
+    body: JSON.stringify({
+      startDate: fromDate,
+      endDate: toDate,
+      hideEmptyCategories: hideEmptyCategories,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'auth-token': authToken,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    for (const key in error.detail) {
+      console.error(error.detail[key]);
+    }
+    return null;
+  }
+  return await response.json();
+}
+
+const getDiagramUrl = async (fromDate: string, toDate: string, authToken: string) => {
+  const diagramUrl = apiRoutes.expensesDiagram(fromDate, toDate);
+  const response = await fetch(diagramUrl, {
+    headers: {
+      'auth-token': authToken,
+    },
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const { image } = await response.json();
+  return image; // Base64 string
+}
+
+export default async function ExpensesReportPage({ params, searchParams }: ExpensesReportPageProps) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale || 'en';
+  const awaitedSearchParams = await searchParams;
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get('authToken')?.value || '';
+  const t = await getTranslations('');
+  const fromDateInitial = awaitedSearchParams.fromDate || new Date(new Date().setDate(1)).toISOString().split('T')[0];
+  const toDateInitial = awaitedSearchParams.toDate || new Date().toISOString().split('T')[0];
+
+  let hideEmptyCategoriesInitial;
+  if (awaitedSearchParams.hideEmptyCategories === 'true' || awaitedSearchParams.hideEmptyCategories === undefined) {
+    hideEmptyCategoriesInitial = true;
+  } else {
+    hideEmptyCategoriesInitial = false;
+  }
+
+  const [responseExpenses, responseAggregated, responseDiagram] = await Promise.all([
+    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, authToken),
+    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, authToken),
+    getDiagramUrl(fromDateInitial, toDateInitial, authToken),
+  ])
+
+  if (!responseExpenses || !responseAggregated) {
+    return (<div>
+      <h1 className="heading-lg">{t("expensesReport")}</h1>
+      <p className="text-red-500 text-center text-lg font-bold mb-4 ">{t("noData")}</p>
+    </div>);
+  }
+
+  const aggregatedSum = responseAggregated.reduce((sum: number, category: any) => sum + category.amount, 0);
 
   return (
-    <main className="container mx-auto px-4">
+    <>
       <div className="mb-4">
         <h1 className="heading-lg">{t("expensesReport")}</h1>
       </div>
 
-      <div className="mb-4 flex space-x-4">
-        <div>
-          <label htmlFor="start-date" className="block text-sm font-medium">
-            {t("startDate")}
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            className="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="end-date" className="block text-sm font-medium">
-            {t("endDate")}
-          </label>
-          <input
-            id="end-date"
-            type="date"
-            className="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
+      <div className="mb-4 flex space-x-4 justify-between">
+        <DatePicker date={fromDateInitial} 
+                    label={t("startDate")} 
+                    isStartDate={true} 
+                    locale={locale} 
+                    fromDate={fromDateInitial} 
+                    toDate={toDateInitial} /> 
+        <DatePicker date={toDateInitial} 
+                    label={t("endDate")} 
+                    isStartDate={false} 
+                    locale={locale} 
+                    fromDate={fromDateInitial} 
+                    toDate={toDateInitial} />
       </div>
 
       <div className="mb-4 flex items-center">
@@ -57,8 +132,7 @@ export default function ExpensesReportPage() {
           id="hide-empty-categories"
           type="checkbox"
           className="form-checkbox h-5 w-5 text-blue-600"
-          checked={hideEmptyCategories}
-          onChange={(e) => setHideEmptyCategories(e.target.checked)}
+          checked={hideEmptyCategoriesInitial}
         />
         <label
           htmlFor="hide-empty-categories"
@@ -71,36 +145,19 @@ export default function ExpensesReportPage() {
       {aggregatedSum > 0 && (
         <div className="mb-4 flex">
           <div className="w-1/2 flex justify-center items-center">
-            {pieDiagramUrl ? (
-              <img src={pieDiagramUrl} alt={t("loadingDiagram")} className="rounded shadow" />
-            ) : (
-              <span className="text-gray-500">{t("loadingDiagram")}</span>
-            )}
+            <img src={responseDiagram || ''} alt={t("diagram")} />
           </div>
-          <div className="w-1/2">
-            <ul className="list-none">
-              {aggregatedCategories.map((category: any) => (
-                <li key={category.id} className="flex justify-between py-2">
-                  <span>{category.label}</span>
-                  <span>
-                    {category.amount}, {t("baseCurrency")}
-                  </span>
-                </li>
-              ))}
-              <li className="font-bold border-t border-gray-300 pt-2">
-                <span>{t("totalExpenses")}</span>
-                <span>
-                  {aggregatedSum} {t("baseCurrency")}
-                </span>
-              </li>
-            </ul>
+
+          <div className="w-1/2 flex justify-center items-center">
+            <AggregatedExpenses
+              aggregatedCategories={responseAggregated}
+              aggregatedSum={aggregatedSum}
+              currencyCode={responseExpenses[0].currencyCode} />
           </div>
         </div>
       )}
 
-      <div>
-        <p className="text-gray-500">{t("noData")}</p>
-      </div>
-    </main>
+      {aggregatedSum > 0 && <CategoriesExpenses expenses={responseExpenses} locale={locale} />}
+    </>
   );
 }

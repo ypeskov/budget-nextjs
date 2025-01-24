@@ -64,5 +64,7 @@
     "archive": "Archive",
     "confirmArchive": "Confirm archive",
     "confirmArchiveMessage": "Are you sure you want to archive this account?",
-    "restoreConfirm": "Are you sure you want to restore this account?"
+    "restoreConfirm": "Are you sure you want to restore this account?",
+    "diagram": "Diagram",
+    "categoriesExpenses": "Categories expenses"
 }

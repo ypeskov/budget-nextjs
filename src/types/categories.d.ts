@@ -1,4 +1,4 @@
-interface Category {
+export interface Category {
   name: string;
   parentId: number;
   isIncome: boolean;
@@ -7,4 +7,14 @@ interface Category {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   children: any[Category];
+}
+
+export interface CategoryExpense {
+  id: number;
+  name: string;
+  totalExpenses: number;
+  parentId: number | null;
+  parentName: string | null;
+  currencyCode: string;
+  isParent: boolean;
 }
