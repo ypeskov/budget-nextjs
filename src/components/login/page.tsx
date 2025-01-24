@@ -4,6 +4,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useUser } from "@/context/UserContext";
+import GoogleLoginComponent from "./GoogleLogin";
 
 interface FormData {
   email: string;
@@ -51,9 +52,9 @@ export default function LoginPage({ locale }: LoginPageProps) {
             "auth-token": data.accessToken,
           },
         });
-  
+
         if (userResponse.ok) {
-          const response = await userResponse.json(); 
+          const response = await userResponse.json();
           setUser({ email: response.email, token: data.accessToken });
         } else {
           console.error("Failed to fetch user profile after login");
@@ -69,6 +70,8 @@ export default function LoginPage({ locale }: LoginPageProps) {
       setError("Error of connection");
     }
   };
+
+
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -112,6 +115,8 @@ export default function LoginPage({ locale }: LoginPageProps) {
             </button>
           </div>
         </form>
+
+        <GoogleLoginComponent locale={locale} />
       </div>
     </div>
   );
