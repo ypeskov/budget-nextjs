@@ -1,10 +1,11 @@
-import Image from "next/image";
 import apiRoutes from "@/routes/apiRoutes";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import AggregatedExpenses from "@/components/reports/expenses/AggregatedExpenses";
 import DatePicker from "@/components/reports/expenses/DatePicker";
 import CategoriesExpenses from "@/components/reports/expenses/CategoriesExpenses";
+import EmptyCategoriesChecker from "@/components/reports/expenses/EmptyCategoriesChecker";
+
 
 interface ExpensesReportPageProps {
   params: Promise<Record<string, string | undefined>>;
@@ -113,33 +114,25 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
       </div>
 
       <div className="mb-4 flex space-x-4 justify-between">
-        <DatePicker date={fromDateInitial} 
-                    label={t("startDate")} 
-                    isStartDate={true} 
-                    locale={locale} 
-                    fromDate={fromDateInitial} 
-                    toDate={toDateInitial} /> 
-        <DatePicker date={toDateInitial} 
-                    label={t("endDate")} 
-                    isStartDate={false} 
-                    locale={locale} 
-                    fromDate={fromDateInitial} 
-                    toDate={toDateInitial} />
+        <DatePicker date={fromDateInitial}
+          label={t("startDate")}
+          isStartDate={true}
+          locale={locale}
+          fromDate={fromDateInitial}
+          toDate={toDateInitial} />
+        <DatePicker date={toDateInitial}
+          label={t("endDate")}
+          isStartDate={false}
+          locale={locale}
+          fromDate={fromDateInitial}
+          toDate={toDateInitial} />
       </div>
 
       <div className="mb-4 flex items-center">
-        <input
-          id="hide-empty-categories"
-          type="checkbox"
-          className="form-checkbox h-5 w-5 text-blue-600"
-          checked={hideEmptyCategoriesInitial}
-        />
-        <label
-          htmlFor="hide-empty-categories"
-          className="ml-2 text-sm font-medium"
-        >
-          {t("hideEmptyCategories")}
-        </label>
+        <EmptyCategoriesChecker hideEmptyCategories={hideEmptyCategoriesInitial}
+          locale={locale}
+          fromDate={fromDateInitial}
+          toDate={toDateInitial} />
       </div>
 
       {aggregatedSum > 0 && (

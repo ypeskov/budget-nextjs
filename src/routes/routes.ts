@@ -18,6 +18,6 @@ export default {
 
   settings: (locale: string) => `/${locale}/settings`,
 
-  expensesReport: (locale: string, fromDate: string, toDate: string) => 
-    `/${locale}/reports/expenses-report?fromDate=${fromDate}&toDate=${toDate}`,
+  expensesReport: (locale: string, fromDate: string, toDate: string, hideEmptyCategories: string) => 
+    `/${locale}/reports/expenses-report?fromDate=${fromDate}&toDate=${toDate}&hideEmptyCategories=${hideEmptyCategories}`,
 };
