@@ -1,3 +1,5 @@
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
 import TransactionsListView from '@/components/transactions/TransactionsListView';
 import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
@@ -48,9 +50,11 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
 
   return (
     <>
-      <TransactionsMenu locale={locale} searchParams={resolvedSearchParams} />
-      <TransactionsFilter accounts={accounts} locale={locale} searchParams={resolvedSearchParams} />
-      <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
+      <NextIntlClientProvider locale={locale} messages={await getMessages()}>
+        <TransactionsMenu locale={locale} searchParams={resolvedSearchParams} />
+        <TransactionsFilter accounts={accounts} locale={locale} searchParams={resolvedSearchParams} />
+        <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
+      </NextIntlClientProvider>
     </>
   );
 };
