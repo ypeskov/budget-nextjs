@@ -27,7 +27,6 @@ export default {
     }) => {
 
       const params = new URLSearchParams({
-        ...(locale && { locale }),
         ...(accountIds && { accountIds: accountIds.join(",") }),
         ...(fromDate && { fromDate }),
         ...(toDate && { toDate }),

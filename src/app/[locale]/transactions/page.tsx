@@ -4,6 +4,7 @@ import { Transaction } from '@/types/transactions';
 import { prepareRequestUrl } from '@/utils/transactions';
 import TransactionsFilter from '@/components/transactions/TransactionsFilter';
 import { Account } from '@/types/accounts';
+import { TransactionsMenu } from '@/components/transactions/TransactionsMenu';
 
 interface TransactionsPageProps {
   params: Promise<{ locale: string }>;
@@ -47,6 +48,7 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
 
   return (
     <>
+      <TransactionsMenu locale={locale} searchParams={resolvedSearchParams} />
       <TransactionsFilter accounts={accounts} locale={locale} searchParams={resolvedSearchParams} />
       <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
     </>
