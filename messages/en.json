@@ -66,5 +66,16 @@
     "confirmArchiveMessage": "Are you sure you want to archive this account?",
     "restoreConfirm": "Are you sure you want to restore this account?",
     "diagram": "Diagram",
-    "categoriesExpenses": "Categories expenses"
+    "categoriesExpenses": "Categories expenses",
+    "reloadTransactions": "Reload transactions",
+    "resetFilters": "Reset filters",
+    "notes": "Notes",
+    "submit": "Submit",
+    "label": "Label",
+    "transactionName": "Transaction name",
+    "time": "Time",
+    "selectAccount": "Select account",
+    "selectCategory": "Select category",
+    "enterAmount": "Enter amount",
+    "additionalNotes": "Additional notes"
 }
