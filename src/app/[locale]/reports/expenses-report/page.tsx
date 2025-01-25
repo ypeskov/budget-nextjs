@@ -150,7 +150,11 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
         </div>
       )}
 
-      {aggregatedSum > 0 && <CategoriesExpenses expenses={responseExpenses} locale={locale} />}
+      {aggregatedSum > 0 && <CategoriesExpenses
+        expenses={responseExpenses}
+        locale={locale}
+        fromDate={fromDateInitial}
+        toDate={toDateInitial} />}
     </>
   );
 }

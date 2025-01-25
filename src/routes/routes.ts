@@ -1,16 +1,45 @@
 export default {
   accounts: (locale: string, archivedOnly = false, includeHidden = false, includeArchived = false) => {
     const params = new URLSearchParams();
-  
+
     if (archivedOnly) params.append('archivedOnly', 'true');
     if (includeHidden) params.append('includeHidden', 'true');
     if (includeArchived) params.append('includeArchived', 'true');
-  
+
     const queryString = params.toString();
     return `/${locale}/accounts${queryString ? `?${queryString}` : ''}`;
   },
 
-  transactions: (locale: string) => `/${locale}/transactions`,
+  transactions: (
+    { locale,
+      accountIds,
+      fromDate,
+      toDate,
+      types,
+      categories,
+    }: {
+      locale?: string,
+      accountIds?: number[],
+      fromDate?: string,
+      toDate?: string,
+      types?: string[],
+      categories?: (number | null)[]
+    }) => {
+
+      const params = new URLSearchParams({
+        ...(locale && { locale }),
+        ...(accountIds && { accountIds: accountIds.join(",") }),
+        ...(fromDate && { fromDate }),
+        ...(toDate && { toDate }),
+        ...(types && { types: types.join(",") }),
+        ...(categories && { categories: categories.join(",") }),
+      });
+    
+      const queryString = params.toString();
+      const basePath = locale ? `/${locale}/transactions` : `/transactions`;
+    
+      return queryString ? `${basePath}?${queryString}` : basePath;
+    },
 
   categories: (locale: string) => `/${locale}/categories`,
 
@@ -23,7 +52,7 @@ export default {
     if (fromDate) params.append('fromDate', fromDate);
     if (toDate) params.append('toDate', toDate);
     if (hideEmptyCategories) params.append('hideEmptyCategories', hideEmptyCategories);
-    
+
     let url = '/reports/expenses-report';
     if (locale) {
       url = `/${locale}${url}`;
