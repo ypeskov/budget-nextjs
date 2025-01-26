@@ -1,19 +1,109 @@
 'use client';
 
-import routes from "@/routes/routes";
 import { useTranslations } from "next-intl";
+import { Transaction } from "@/types/transactions";
+import { useEffect, useState } from "react";
+import ApiRoutes from "@/routes/apiRoutes";
+import { getCookie } from "@/utils/cookies";
+import { Account } from "@/types/accounts";
+import { Category } from "@/types/categories";
+import { DateTime } from "luxon";
+import { useRouter } from "next/navigation";
+import routes from "@/routes/routes";
 
 interface TransactionFormProps {
   locale: string;
   closeForm: () => void;
+  transaction?: Transaction;
 }
 
-export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => {
-  const t = useTranslations('');
+type TransactionRequest = {
+  id?: number;
+  accountId?: number;
+  label: string;
+  amount: number;
+  categoryId: number;
+  dateTime: string;
+  notes: string;
+  isTransfer: boolean;
+  isIncome: boolean;
+}
 
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const fetchAccounts = async () => {
+  const authToken = getCookie('authToken');
+  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
+  const accounts = await fetch(ApiRoutes.accounts(), { headers });
+  if (accounts.ok) {
+    return accounts.json();
+  }
+  return [];
+}
+
+const fetchCategories = async () => {
+  const authToken = getCookie('authToken');
+  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
+  const categories = await fetch(ApiRoutes.categories(), { headers });
+  if (categories.ok) {
+    return categories.json();
+  }
+  return [];
+}
+
+const submitTransaction = async (transactionRequest: TransactionRequest, isNewTransaction: boolean): Promise<Transaction | null> => {
+  const authToken = getCookie('authToken');
+  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
+
+  const method = isNewTransaction ? 'POST' : 'PUT';
+  const response = await fetch(ApiRoutes.submitTransaction(), {
+    method: method,
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify(transactionRequest)
+  });
+  if (response.ok) {
+    return response.json();
+  }
+  console.error(response);
+  return null;
+}
+
+export const TransactionForm = ({ locale, closeForm, transaction }: TransactionFormProps) => {
+  const t = useTranslations('');
+  const [label, setLabel] = useState(transaction?.label || '');
+  const [account, setAccount] = useState(transaction?.account.id || '');
+  const [amount, setAmount] = useState(transaction?.amount || 0);
+  const [category, setCategory] = useState(transaction?.category?.id || '');
+  const [date, setDate] = useState(transaction ? new Date(transaction.dateTime).toISOString().split('T')[0] : '');
+  const [time, setTime] = useState(transaction ? new Date(transaction.dateTime).toISOString().split('T')[1].split('.')[0] : '');
+  const [notes, setNotes] = useState(transaction?.notes || '');
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const router = useRouter();
+  useEffect(() => {
+    fetchAccounts().then(setAccounts);
+    fetchCategories().then(setCategories);
+  }, []);
+
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('Form submitted');
+
+    const transactionRequest: TransactionRequest = {
+      id: transaction?.id || undefined,
+      accountId: Number(account),
+      label,
+      amount,
+      categoryId: Number(category),
+      dateTime: DateTime.fromISO(date + 'T' + time).toFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+      notes,
+      isTransfer: false,
+      isIncome: false,
+    };
+
+    const response = await submitTransaction(transactionRequest, transaction?.id ? false : true);
+    if (response) {
+      router.push(routes.transactionDetails({ locale, transactionId: response.id }));
+      closeForm();
+    }
   };
 
   const handlePopupClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -51,6 +141,8 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
               className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               placeholder={t('transactionName')}
               required
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
             />
           </div>
 
@@ -63,10 +155,13 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
               name="account"
               className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               required
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
             >
               <option value="">{t('selectAccount')}</option>
-              <option value="account1">Account 1</option>
-              <option value="account2">Account 2</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>{account.name}</option>
+              ))}
             </select>
           </div>
 
@@ -81,6 +176,8 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
               className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               placeholder={t('enterAmount')}
               required
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
             />
           </div>
 
@@ -93,10 +190,13 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
               name="category"
               className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               required
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">{t('selectCategory')}</option>
-              <option value="category1">Category 1</option>
-              <option value="category2">Category 2</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
             </select>
           </div>
 
@@ -111,6 +211,8 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
                 name="date"
                 className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
               />
             </div>
             <div className="flex-1">
@@ -123,6 +225,8 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
                 name="time"
                 className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
               />
             </div>
           </div>
@@ -137,6 +241,8 @@ export const TransactionForm = ({ locale, closeForm }: TransactionFormProps) => 
               rows={3}
               className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               placeholder={t('additionalNotes')}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             ></textarea>
           </div>
 

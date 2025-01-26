@@ -83,5 +83,6 @@
     "transactionCategory": "Категорія",
     "transactionDate": "Дата",
     "transactionTime": "Час",
-    "transactionDateTime": "Дата і час"
+    "transactionDateTime": "Дата і час",
+    "transactionAccount": "Рахунок"
 }

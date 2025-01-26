@@ -83,5 +83,6 @@
     "transactionCategory": "Category",
     "transactionDate": "Date",
     "transactionTime": "Time",
-    "transactionDateTime": "Date and time"
+    "transactionDateTime": "Date and time",
+    "transactionAccount": "Account"
 }

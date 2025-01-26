@@ -3,13 +3,15 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import routes from "@/routes/routes";
 import { TransactionForm } from "./TransactionForm";
+import { Transaction } from "@/types/transactions";
 
 interface TransactionsMenuProps {
   locale: string;
   isNewTransaction: boolean;
+  transaction?: Transaction;
 }
 
-export const TransactionsMenu = ({ locale, isNewTransaction }: TransactionsMenuProps) => {
+export const TransactionsMenu = ({ locale, isNewTransaction, transaction }: TransactionsMenuProps) => {
   const t = useTranslations('');
   const [isTransactionFormOpen, setIsTransactionFormOpen] = useState(false);
 
@@ -30,7 +32,7 @@ export const TransactionsMenu = ({ locale, isNewTransaction }: TransactionsMenuP
         </span>
       </button>
       )}
-      {isTransactionFormOpen && <TransactionForm locale={locale} closeForm={closeForm} />}
+      {isTransactionFormOpen && <TransactionForm locale={locale} closeForm={closeForm} transaction={transaction} />}
     </div>
   );
 };

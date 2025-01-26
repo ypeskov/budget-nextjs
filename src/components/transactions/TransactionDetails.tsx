@@ -23,7 +23,7 @@ export const TransactionDetails = ({ locale, transaction }: TransactionDetailsPr
 
   return (
     <>
-      <TransactionsMenu locale={locale} isNewTransaction={false} />
+      <TransactionsMenu locale={locale} isNewTransaction={false} transaction={transaction} />
 
       <div className="mx-auto bg-white shadow-lg rounded-lg p-6 border border-gray-200">
         <h1 className="text-4xl font-bold text-gray-800 mb-6 border-b border-gray-300 pb-2">
@@ -33,6 +33,10 @@ export const TransactionDetails = ({ locale, transaction }: TransactionDetailsPr
           <div className="grid grid-cols-2 gap-4 hover:bg-gray-100 p-2 rounded-md">
             <span className="text-gray-900 font-bold">{t('transactionName')}:</span>
             <span className="font-medium text-gray-900">{transaction.label}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 hover:bg-gray-100 p-2 rounded-md">
+            <span className="text-gray-900 font-bold">{t('transactionAccount')}:</span>
+            <span className="font-medium text-gray-900">{transaction.account.name}</span>
           </div>
           <div className="grid grid-cols-2 gap-4 hover:bg-gray-100 p-2 rounded-md">
             <span className="text-gray-900 font-bold">{t('transactionAmount')}:</span>
