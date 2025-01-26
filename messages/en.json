@@ -83,5 +83,12 @@
     "transactionCategory": "Category",
     "transactionDate": "Date",
     "transactionTime": "Time",
-    "transactionDateTime": "Date and time"
+    "transactionDateTime": "Date and time",
+    "transactionAccount": "Account",
+    "isIncome": "Income",
+    "isTransfer": "Transfer",
+    "targetAccount": "Target account",
+    "selectTargetAccount": "Select target account",
+    "targetAmount": "Target amount",
+    "enterTargetAmount": "Enter target amount"
 }

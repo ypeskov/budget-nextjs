@@ -111,7 +111,7 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
       balance: parseLocalizedNumber(balance),
       initialBalance: parseLocalizedNumber(initialBalance),
       creditLimit: parseLocalizedNumber(creditLimit),
-      openingDate,
+      openingDate: DateTime.fromISO(openingDate).toFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"),
       comment,
       isHidden,
       showInReports,

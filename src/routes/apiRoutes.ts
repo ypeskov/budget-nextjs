@@ -7,4 +7,7 @@ export default {
   expensesAggregate: () => `${API_URL}/reports/expenses-data/`,
   expensesDiagram: (fromDate: string, toDate: string) =>`${API_URL}/reports/diagram/pie/${fromDate}/${toDate}`,
   transaction: (id: number) => `${API_URL}/transactions/${id}`,
+  submitTransaction: () => `${API_URL}/transactions`,
+  accounts: () => `${API_URL}/accounts`,
+  categories: () => `${API_URL}/categories`,
 };
