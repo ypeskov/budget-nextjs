@@ -40,6 +40,12 @@ export default {
       return queryString ? `${basePath}?${queryString}` : basePath;
     },
 
+
+  transactionDetails: ({ locale, transactionId }: { locale?: string, transactionId: number }) => {
+    const basePath = locale ? `/${locale}/transactions` : `/transactions`;
+    return `${basePath}/${transactionId}`;
+  },
+
   categories: (locale: string) => `/${locale}/categories`,
 
   reports: (locale: string) => `/${locale}/reports`,

@@ -6,10 +6,10 @@ import { TransactionForm } from "./TransactionForm";
 
 interface TransactionsMenuProps {
   locale: string;
-  searchParams: Record<string, string | undefined>;
+  isNewTransaction: boolean;
 }
 
-export const TransactionsMenu = ({ locale, searchParams }: TransactionsMenuProps) => {
+export const TransactionsMenu = ({ locale, isNewTransaction }: TransactionsMenuProps) => {
   const t = useTranslations('');
   const [isTransactionFormOpen, setIsTransactionFormOpen] = useState(false);
 
@@ -21,14 +21,15 @@ export const TransactionsMenu = ({ locale, searchParams }: TransactionsMenuProps
     <div className="relative w-full mb-4 flex justify-between">
       <button className="bg-gray-200 text-gray-900 p-4 cursor-pointer flex items-center justify-between rounded-lg"
         onClick={() => setIsTransactionFormOpen(true)}>
-        <span className="font-bold text-lg">{t('newTransaction')}</span>
+        <span className="font-bold text-lg">{isNewTransaction ? t('newTransaction') : t('editTransaction')}</span>
       </button>
-      <button className="bg-gray-200 text-gray-900 p-4 cursor-pointer flex items-center justify-between rounded-lg">
+      {isNewTransaction && (<button className="bg-gray-200 text-gray-900 p-4 cursor-pointer flex items-center justify-between rounded-lg">
         <span className="font-bold text-lg"
           onClick={() => { window.location.href = routes.transactions({ locale }); }}>
           {t('resetFilters')}
         </span>
       </button>
+      )}
       {isTransactionFormOpen && <TransactionForm locale={locale} closeForm={closeForm} />}
     </div>
   );

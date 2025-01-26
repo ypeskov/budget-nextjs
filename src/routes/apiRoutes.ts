@@ -6,4 +6,5 @@ export default {
   expenses: () => `${API_URL}/reports/expenses-by-categories/`,
   expensesAggregate: () => `${API_URL}/reports/expenses-data/`,
   expensesDiagram: (fromDate: string, toDate: string) =>`${API_URL}/reports/diagram/pie/${fromDate}/${toDate}`,
+  transaction: (id: number) => `${API_URL}/transactions/${id}`,
 };

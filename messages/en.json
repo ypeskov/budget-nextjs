@@ -77,5 +77,11 @@
     "selectAccount": "Select account",
     "selectCategory": "Select category",
     "enterAmount": "Enter amount",
-    "additionalNotes": "Additional notes"
+    "additionalNotes": "Additional notes",
+    "transactionDetails": "Transaction details",
+    "transactionAmount": "Amount",
+    "transactionCategory": "Category",
+    "transactionDate": "Date",
+    "transactionTime": "Time",
+    "transactionDateTime": "Date and time"
 }

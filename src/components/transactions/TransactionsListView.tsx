@@ -6,6 +6,7 @@ import { Transaction } from '@/types/transactions';
 import { useTranslations } from 'next-intl';
 import { getCookie } from '@/utils/cookies';
 import { prepareRequestUrl } from '@/utils/transactions';
+import routes from '@/routes/routes';
 
 interface TransactionsListViewProps {
   transactions: Transaction[];
@@ -110,7 +111,7 @@ export default function TransactionsListView({ transactions, locale, searchParam
             </li>
             {transactions.map((trans) => (
               <li key={trans.id} className="list-item">
-                <Link href={`/accountDetails/${trans.id}`} className="link-default link-hover">
+                <Link href={routes.transactionDetails({transactionId: trans.id })} className="link-default link-hover">
                   <div className="list-item-container">
                     <div className="list-item-label">
                       <div className="truncate">{trans.label}</div>

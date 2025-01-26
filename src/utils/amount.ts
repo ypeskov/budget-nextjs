@@ -7,10 +7,13 @@ export function formatAmount(amount: number,
     style = "currency";
   }
 
-  return amount.toLocaleString(locale, {
+  const formattedAmount = amount.toLocaleString(locale, {
     style: style,
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
     currency: currencyCode,
+    currencyDisplay: 'code',
   });
+
+  return formattedAmount;
 }

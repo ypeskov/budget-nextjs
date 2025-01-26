@@ -77,5 +77,11 @@
     "selectAccount": "Вибрати рахунок",
     "selectCategory": "Вибрати категорію",
     "enterAmount": "Введіть суму",
-    "additionalNotes": "Додаткові коментарі"
+    "additionalNotes": "Додаткові коментарі",
+    "transactionDetails": "Деталі транзакції",
+    "transactionAmount": "Сума",
+    "transactionCategory": "Категорія",
+    "transactionDate": "Дата",
+    "transactionTime": "Час",
+    "transactionDateTime": "Дата і час"
 }

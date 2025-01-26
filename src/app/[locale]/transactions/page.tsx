@@ -51,7 +51,7 @@ const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps)
   return (
     <>
       <NextIntlClientProvider locale={locale} messages={await getMessages()}>
-        <TransactionsMenu locale={locale} searchParams={resolvedSearchParams} />
+        <TransactionsMenu locale={locale} isNewTransaction={true} />
         <TransactionsFilter accounts={accounts} locale={locale} searchParams={resolvedSearchParams} />
         <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
       </NextIntlClientProvider>
