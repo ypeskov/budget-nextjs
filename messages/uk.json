@@ -84,5 +84,11 @@
     "transactionDate": "Дата",
     "transactionTime": "Час",
     "transactionDateTime": "Дата і час",
-    "transactionAccount": "Рахунок"
+    "transactionAccount": "Рахунок",
+    "isIncome": "Дохід",
+    "isTransfer": "Переказ",
+    "targetAccount": "Цільовий рахунок",
+    "selectTargetAccount": "Вибрати цільовий рахунок",
+    "targetAmount": "Цільова сума",
+    "enterTargetAmount": "Введіть цільову суму"
 }
