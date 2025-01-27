@@ -6,7 +6,7 @@ export interface Category {
   userId: number;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-  children: any[Category];
+  children: Category[];
 }
 
 export interface CategoryExpense {
