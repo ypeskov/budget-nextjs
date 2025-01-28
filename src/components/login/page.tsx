@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useUser } from "@/context/UserContext";
 import GoogleLoginComponent from "./GoogleLogin";
+import { request } from "@/utils/request/browser";
+import routes from "@/routes/apiRoutes";  
+import apiRoutes from "@/routes/apiRoutes";
 
 interface FormData {
   email: string;
@@ -14,8 +17,6 @@ interface FormData {
 interface LoginPageProps {
   locale: string;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function LoginPage({ locale }: LoginPageProps) {
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
@@ -36,18 +37,15 @@ export default function LoginPage({ locale }: LoginPageProps) {
     e.preventDefault();
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await request(apiRoutes.login(), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         const data: { accessToken: string } = await response.json();
         document.cookie = `authToken=${data.accessToken}; path=/; max-age=3600;`;
-        const userResponse = await fetch(`${API_URL}/auth/profile`, {
+        const userResponse = await request(apiRoutes.profile(), {
           headers: {
             "auth-token": data.accessToken,
           },
