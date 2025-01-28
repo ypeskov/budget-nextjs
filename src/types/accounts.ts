@@ -1,4 +1,4 @@
-export interface Account {
+export type Account = {
   userId: number;
   accountTypeId: number;
   currencyId: number;
@@ -27,7 +27,7 @@ export interface Account {
   archivedAt: string;
 }
 
-export interface BaseCurrency {
+export type BaseCurrency = {
   id: number;
   code: string;
   name: string;

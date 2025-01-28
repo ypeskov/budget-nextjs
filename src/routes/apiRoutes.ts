@@ -26,4 +26,6 @@ export default {
   
     return `${API_URL}/transactions/?${params.toString()}`;
   },
+  
+  baseCurrency: () => `${API_URL}/settings/base-currency`,
 };

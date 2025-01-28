@@ -1,51 +1,37 @@
-import { cookies } from 'next/headers';
 import { BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 import FilterControls from "@/components/accounts/FilterControls";
+import { request } from "@/utils/request/api";
+import routes from "@/routes/apiRoutes";
+import { getAuthToken } from "@/utils/auth";
 
-function UnauthorizedMsg() {
-  return <div className="text-center text-red-500 text-3xl">Unauthorized</div>;
+type AccountsPageParams = {
+  searchParams: Promise<Record<string, string | undefined>>;
+  params: Promise<{ locale: string }>
 }
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default async function AccountsPage({
   searchParams,
   params
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-  params: Promise<{ locale: string }>
-}) {
+}: AccountsPageParams) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
   const awaitedSearchParams = await searchParams;
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('authToken')?.value || '';
-  const includeHidden = awaitedSearchParams.includeHidden === "true";
-  const includeArchived = awaitedSearchParams.includeArchived === "true";
-  const archivedOnly = awaitedSearchParams.archivedOnly === "true";
+  const authToken = await getAuthToken();
 
-  const accountsUrl = `${apiBaseUrl}/accounts/?includeHidden=${includeHidden}` +
-    `&includeArchived=${includeArchived}` +
-    `&archivedOnly=${archivedOnly}`;
-  const baseCurrencyUrl = `${apiBaseUrl}/settings/base-currency`;
+  const accountsSearchParams = new URLSearchParams({
+    includeHidden: awaitedSearchParams.includeHidden === "true" ? "true" : "false",
+    includeArchived: awaitedSearchParams.includeArchived === "true" ? "true" : "false",
+    archivedOnly: awaitedSearchParams.archivedOnly === "true" ? "true" : "false",
+  });
+  const accountsUrl = `${routes.accounts()}?${accountsSearchParams.toString()}`;
+  const baseCurrencyUrl = routes.baseCurrency();
 
   // Fetch accounts and base currency on the server
-  const [accountsResponse, baseCurrencyResponse] = await Promise.all([
-    fetch(accountsUrl, { headers: { 'auth-token': authToken }, cache: 'no-store' }),
-    fetch(baseCurrencyUrl, { headers: { 'auth-token': authToken }, cache: 'force-cache' }),
+  const [accounts, baseCurrency]: [Accounts, BaseCurrency] = await Promise.all([
+    request(accountsUrl, { headers: { 'auth-token': authToken }, cache: 'no-store' }),
+    request(baseCurrencyUrl, { headers: { 'auth-token': authToken }, cache: 'force-cache' }),
   ]);
-
-  if (!accountsResponse.ok || !baseCurrencyResponse.ok) {
-    if (accountsResponse.status === 401 || baseCurrencyResponse.status === 401) {
-      return <UnauthorizedMsg />;
-    }
-    const error = 'Some error occurred while fetching data';
-    return <div className="text-center text-red-500 text-3xl">{error}</div>;
-  }
-
-  const accounts: Accounts = await accountsResponse.json();
-  const baseCurrency: BaseCurrency = await baseCurrencyResponse.json();
 
   return (
     <>
