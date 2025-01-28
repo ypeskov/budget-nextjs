@@ -58,28 +58,29 @@ export default {
     if (toDate) params.append('toDate', toDate);
     if (hideEmptyCategories) params.append('hideEmptyCategories', hideEmptyCategories);
 
-    let url = '/reports/expenses-report';
-    if (locale) {
-      url = `/${locale}${url}`;
-    }
+    const basePath = locale ? `/${locale}/reports/expenses-report` : `/reports/expenses-report`;
     const queryString = params.toString();
-    return `${url}${queryString ? `?${queryString}` : ''}`;
+    return queryString ? `${basePath}?${queryString}` : basePath;
   },
 
   cashFlowReport: (locale?: string) => {
-    let url = '/reports/cash-flow';
-    if (locale) {
-      url = `/${locale}${url}`;
-    }
-    return url;
+    const basePath = locale ? `/${locale}/reports/cash-flow` : `/reports/cash-flow`;
+    return basePath;
   },
 
   balanceReport: (locale?: string) => {
-    let url = '/reports/balance';
-    if (locale) {
-      url = `/${locale}${url}`;
-    }
-    return url;
+    const basePath = locale ? `/${locale}/reports/balance` : `/reports/balance`;
+    return basePath;
   },
 
+
+  login: (locale?: string) => {
+    const basePath = locale ? `/${locale}/login` : `/login`;
+    return basePath;
+  },
+
+  logout: (locale?: string) => {
+    const basePath = locale ? `/${locale}/logout` : `/logout`;
+    return basePath;
+  },
 };
