@@ -8,5 +8,6 @@ export async function request(url: string, options: RequestInit) {
     ...(token ? { "auth-token": token } : {}),
   };
 
-  return clientRequest(url, { ...options, headers });
+  const response = await clientRequest(url, { ...options, headers });
+  return await response.json();
 }
