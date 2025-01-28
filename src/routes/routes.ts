@@ -1,13 +1,22 @@
 export default {
-  accounts: (locale: string, archivedOnly = false, includeHidden = false, includeArchived = false) => {
+  accounts: ({ locale,
+    archivedOnly = false,
+    includeHidden = false,
+    includeArchived = false }:
+    { locale?: string, 
+      archivedOnly?: boolean, 
+      includeHidden?: boolean, 
+      includeArchived?: boolean }) => {
     const params = new URLSearchParams();
+
+    const basePath = locale ? `/${locale}/accounts` : `/accounts`;
 
     if (archivedOnly) params.append('archivedOnly', 'true');
     if (includeHidden) params.append('includeHidden', 'true');
     if (includeArchived) params.append('includeArchived', 'true');
 
     const queryString = params.toString();
-    return `/${locale}/accounts${queryString ? `?${queryString}` : ''}`;
+    return queryString ? `${basePath}?${queryString}` : basePath;
   },
 
   transactions: (
@@ -26,19 +35,19 @@ export default {
       categories?: (number | null)[]
     }) => {
 
-      const params = new URLSearchParams({
-        ...(accountIds && { accountIds: accountIds.join(",") }),
-        ...(fromDate && { fromDate }),
-        ...(toDate && { toDate }),
-        ...(types && { types: types.join(",") }),
-        ...(categories && { categories: categories.join(",") }),
-      });
-    
-      const queryString = params.toString();
-      const basePath = locale ? `/${locale}/transactions` : `/transactions`;
-    
-      return queryString ? `${basePath}?${queryString}` : basePath;
-    },
+    const params = new URLSearchParams({
+      ...(accountIds && { accountIds: accountIds.join(",") }),
+      ...(fromDate && { fromDate }),
+      ...(toDate && { toDate }),
+      ...(types && { types: types.join(",") }),
+      ...(categories && { categories: categories.join(",") }),
+    });
+
+    const queryString = params.toString();
+    const basePath = locale ? `/${locale}/transactions` : `/transactions`;
+
+    return queryString ? `${basePath}?${queryString}` : basePath;
+  },
 
 
   transactionDetails: ({ locale, transactionId }: { locale?: string, transactionId: number }) => {

@@ -9,5 +9,5 @@ export async function request(url: string, options: RequestInit) {
   };
 
   const response = await clientRequest(url, { ...options, headers });
-  return response;
+  return await response.json();
 }
