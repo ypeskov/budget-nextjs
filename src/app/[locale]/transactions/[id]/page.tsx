@@ -2,6 +2,8 @@ import { TransactionDetails } from "@/components/transactions/TransactionDetails
 import { Transaction } from "@/types/transactions";
 import apiRoutes from "@/routes/apiRoutes";
 import { getAuthToken } from "@/utils/auth";
+import { getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 
 interface TransactionPageProps {
   params: Promise<{ id: string, locale: string }>;
@@ -35,7 +37,9 @@ export default async function TransactionPage({ params }: TransactionPageProps) 
 
   return (
     <div>
-      <TransactionDetails locale={locale} transaction={transaction} />
+      <NextIntlClientProvider locale={locale} messages={await getMessages()}>
+        <TransactionDetails locale={locale} transaction={transaction} />
+      </NextIntlClientProvider>
     </div>
   );
 }

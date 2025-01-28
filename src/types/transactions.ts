@@ -1,8 +1,8 @@
-import { Account } from "./accounts";
-import { Category } from "./categories";
-import { User } from "./users";
+import { Account } from "@/types/accounts";
+import { Category } from "@/types/categories";
+import { User } from "@/types/users";
 
-interface Transaction {
+export interface Transaction {
   id: number;
   userId: number;
   accountId: number;
