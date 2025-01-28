@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { getCookie } from '@/utils/cookies';
 import { prepareRequestUrl } from '@/utils/transactions';
 import routes from '@/routes/routes';
+import { request as clientRequest } from '@/utils/request/browser';
 
 interface TransactionsListViewProps {
   transactions: Transaction[];
@@ -27,10 +28,9 @@ export default function TransactionsListView({ transactions, locale, searchParam
     setLoading(true);
     try {
       const transactionsUrl = prepareRequestUrl(page, searchParams);
-      const authToken = getCookie('authToken');
-      const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-      const response = await fetch(transactionsUrl, { headers });
-      const data: Transaction[] = await response.json();
+      const data: Transaction[] = await clientRequest(transactionsUrl, {
+        cache: "no-store",
+      });
   
       if (data.length === 0) {
         setHasMore(false);

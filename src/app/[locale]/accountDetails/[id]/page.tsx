@@ -2,39 +2,26 @@ import TransactionsListView from "@/components/transactions/TransactionsListView
 import AccountDetails from "@/components/accounts/AccountDetails";
 import { Account } from "@/types/accounts";
 import { Transaction } from "@/types/transactions";
-import { getAuthToken } from "@/utils/auth";
-import { prepareRequestUrl } from "@/utils/transactions";
 import TransactionsFilter from '@/components/transactions/TransactionsFilter';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { request } from "@/utils/request/api";
+import routes from "@/routes/apiRoutes";
 
 interface RequestParams {
   params: Promise<{ id: string, locale: string }>;
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-async function fetchWithErrorHandling(url: string): Promise<any> {
-  const response = await fetch(url, {
-    headers: { "auth-token": await getAuthToken() },
+async function fetchAccount(id: number): Promise<Account> {
+  return request(routes.account(id), {
     cache: "no-store",
   });
-
-  if (!response.ok) {
-    const error = await response.json();
-    console.error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
-    throw new Error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
-  }
-
-  return response.json();
-}
-
-async function fetchAccount(id: number): Promise<Account> {
-  return fetchWithErrorHandling(`${apiBaseUrl}/accounts/${id}`);
 }
 
 async function fetchTransactions(accountId: number): Promise<Transaction[]> {
-  const transactionsUrl = prepareRequestUrl(1, { accounts: String(accountId) });
-  return fetchWithErrorHandling(transactionsUrl);
+  const transactionsUrl = routes.transactions(1, { accounts: String(accountId) });
+  return request(transactionsUrl, {
+    cache: "no-store",
+  });
 }
 
 export default async function AccountDetailsPage({ params, searchParams }: RequestParams) {
