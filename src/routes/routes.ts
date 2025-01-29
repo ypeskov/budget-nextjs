@@ -19,6 +19,12 @@ export default {
     return queryString ? `${basePath}?${queryString}` : basePath;
   },
 
+
+  accountDetails: ({ locale, accountId }: { locale?: string, accountId: number }) => {
+    const basePath = locale ? `/${locale}/accountDetails/${accountId}` : `/accountDetails/${accountId}`;
+    return basePath;
+  },
+
   transactions: (
     { locale,
       accountIds,

@@ -90,5 +90,6 @@
     "targetAccount": "Target account",
     "selectTargetAccount": "Select target account",
     "targetAmount": "Target amount",
-    "enterTargetAmount": "Enter target amount"
+    "enterTargetAmount": "Enter target amount",
+    "sessionExpiresIn": "Session expires in {timeLeft} seconds"
 }

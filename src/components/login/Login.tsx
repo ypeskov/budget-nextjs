@@ -23,8 +23,8 @@ export default function LoginPage({ locale }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const t = useTranslations('');
-  const { setUser } = useUser();
-
+  const { setUser, resetTimer } = useUser();
+  
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -48,7 +48,7 @@ export default function LoginPage({ locale }: LoginPageProps) {
       const userProfile = await request(apiRoutes.profile(), {});
 
       setUser({ email: userProfile.email, token: accessToken });
-
+      resetTimer();
       router.push(routes.accounts({locale}));
   } catch (error) {
     console.error("Error during login:", error);

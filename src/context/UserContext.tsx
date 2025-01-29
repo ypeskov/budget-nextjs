@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { useAuthTimer } from "@/hooks/authHook";
 
 interface User {
   email: string | null;
@@ -10,18 +11,23 @@ interface User {
 interface UserContextType {
   user: User;
   setUser: (user: User) => void;
+  expireTime: number | null;
+  resetTimer: () => void;
 }
 
 const UserContext = createContext<UserContextType>({
   user: { email: null, token: null },
-  setUser: () => {},
+  setUser: () => { },
+  expireTime: null,
+  resetTimer: () => { },
 });
+
 const defaultUser: User = { email: null, token: null };
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-
+  const { expireTime, resetTimer } = useAuthTimer('en');
   useEffect(() => {
     const loadUserProfile = async () => {
       const token = document.cookie
@@ -44,6 +50,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (userResponse.ok) {
           const response = await userResponse.json();
           setUser({ email: response.email, token });
+          resetTimer();
         } else {
           console.error("Failed to fetch user profile");
           setUser(null);
@@ -58,12 +65,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider
-      value={{
-        user: user || defaultUser,
-        setUser,
-      }}
-    >
+    <UserContext.Provider value={{ user: user || defaultUser, setUser, expireTime, resetTimer }}>
       {children}
     </UserContext.Provider>
   );

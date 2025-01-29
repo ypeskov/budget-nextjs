@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Account } from "@/types/accounts";
 import { useTranslations } from "next-intl";
+import routes from "@/routes/routes";
 
 interface TransactionsFilterProps {
   accounts: Account[];
@@ -51,11 +52,11 @@ const TransactionsFilter = ({ accounts, locale, searchParams, isAccountDetailsPa
 
     let newUrl;
     if (isAccountDetailsPage) {
-      newUrl = `/${locale}/accountDetails/${selectedAccounts[0]}/?${params.toString()}`;
+      newUrl = routes.accountDetails({ locale, accountId: selectedAccounts[0] });
       window.location.href = newUrl;
       return;
     }
-    newUrl = `/${locale}/transactions/?${params.toString()}`;
+    newUrl = routes.transactions({ locale, accountIds: selectedAccounts, fromDate, toDate, types });
     window.location.href = newUrl;
   };
 

@@ -90,5 +90,6 @@
     "targetAccount": "Цільовий рахунок",
     "selectTargetAccount": "Вибрати цільовий рахунок",
     "targetAmount": "Цільова сума",
-    "enterTargetAmount": "Введіть цільову суму"
+    "enterTargetAmount": "Введіть цільову суму",
+    "sessionExpiresIn": "Сесія закінчується через {timeLeft} секунд"
 }
