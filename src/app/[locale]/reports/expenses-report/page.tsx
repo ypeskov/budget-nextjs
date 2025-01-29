@@ -5,74 +5,70 @@ import AggregatedExpenses from "@/components/reports/expenses/AggregatedExpenses
 import DatePicker from "@/components/reports/expenses/DatePicker";
 import CategoriesExpenses from "@/components/reports/expenses/CategoriesExpenses";
 import EmptyCategoriesChecker from "@/components/reports/expenses/EmptyCategoriesChecker";
+import { request } from "@/utils/request/api";
+import { redirect } from "next/navigation";
+import routes from "@/routes/routes";
+import { UnauthorizedError } from "@/utils/request/errors";
 
-
-interface ExpensesReportPageProps {
+type ExpensesReportPageProps = {
   params: Promise<Record<string, string | undefined>>;
   searchParams: Promise<Record<string, string | undefined>>;
+  locale: string;
 }
 
-const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, authToken: string) => {
-  const response = await fetch(apiRoutes.expenses(), {
-    method: 'POST',
-    body: JSON.stringify({
-      startDate: fromDate,
-      endDate: toDate,
-      hideEmptyCategories: hideEmptyCategories,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      'auth-token': authToken,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    for (const key in error.detail) {
-      console.error(error.detail[key]);
+const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string, t: any) => {
+  try {
+    const expenses = await request(apiRoutes.expenses(), {
+      method: 'POST',
+      body: JSON.stringify({
+        startDate: fromDate,
+        endDate: toDate,
+        hideEmptyCategories: hideEmptyCategories,
+      }),
+    });
+    return expenses;
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login(locale));
     }
+    console.error(error);
     return null;
   }
-
-  return await response.json();
 }
 
-const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, authToken: string) => {
-  const response = await fetch(apiRoutes.expensesAggregate(), {
-    method: 'POST',
-    body: JSON.stringify({
-      startDate: fromDate,
-      endDate: toDate,
-      hideEmptyCategories: hideEmptyCategories,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      'auth-token': authToken,
-    },
-  });
+const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
+  try {
+    const response = await request(apiRoutes.expensesAggregate(), {
+      method: 'POST',
+      body: JSON.stringify({
+        startDate: fromDate,
+        endDate: toDate,
+        hideEmptyCategories: hideEmptyCategories,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    for (const key in error.detail) {
-      console.error(error.detail[key]);
+    return response;
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login(locale));
     }
+    console.error(error);
     return null;
   }
-  return await response.json();
 }
 
-const getDiagramUrl = async (fromDate: string, toDate: string, authToken: string) => {
+const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) => {
   const diagramUrl = apiRoutes.expensesDiagram(fromDate, toDate);
-  const response = await fetch(diagramUrl, {
-    headers: {
-      'auth-token': authToken,
-    },
-  });
-  if (!response.ok) {
+  try {
+    const diagram = await request(diagramUrl, {});
+    return diagram.image; // Base64 string
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login(locale));
+    }
+    console.error(error);
     return null;
   }
-  const { image } = await response.json();
-  return image; // Base64 string
 }
 
 export default async function ExpensesReportPage({ params, searchParams }: ExpensesReportPageProps) {
@@ -93,9 +89,9 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
   }
 
   const [responseExpenses, responseAggregated, responseDiagram] = await Promise.all([
-    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, authToken),
-    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, authToken),
-    getDiagramUrl(fromDateInitial, toDateInitial, authToken),
+    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale, t),
+    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
+    getDiagramUrl(fromDateInitial, toDateInitial, locale),
   ])
 
   if (!responseExpenses || !responseAggregated) {
