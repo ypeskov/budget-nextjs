@@ -4,12 +4,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link } from '@/i18n/routing';
 import { Transaction } from '@/types/transactions';
 import { useTranslations } from 'next-intl';
-import { getCookie } from '@/utils/cookies';
+import { useRouter } from 'next/navigation';
 import { prepareRequestUrl } from '@/utils/transactions';
 import routes from '@/routes/routes';
 import { request as clientRequest } from '@/utils/request/browser';
+import { UnauthorizedError, ValidationError } from '@/utils/request/errors';
 
-interface TransactionsListViewProps {
+type TransactionsListViewProps = {
   transactions: Transaction[];
   locale: string;
   searchParams: Record<string, string | undefined>;
@@ -21,7 +22,7 @@ export default function TransactionsListView({ transactions, locale, searchParam
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(2);
   const [hasMore, setHasMore] = useState(true);
-
+  const router = useRouter();
   const loadMoreTransactions = useCallback(async () => {
     if (loading || !hasMore) return;
   
@@ -43,6 +44,15 @@ export default function TransactionsListView({ transactions, locale, searchParam
         setPage((prev) => prev + 1);
       }
     } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        console.log("Unauthorized");
+        router.push(routes.login(locale));
+      }
+
+      if (error instanceof ValidationError) {
+        console.log("Validation error", error);
+      }
+
       console.error("Error loading more transactions:", error);
     } finally {
       setLoading(false);
