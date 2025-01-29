@@ -36,7 +36,7 @@ const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories
   }
 }
 
-const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, authToken: string) => {
+const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
   try {
     const response = await request(apiRoutes.expensesAggregate(), {
       method: 'POST',
@@ -49,23 +49,26 @@ const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmpty
 
     return response;
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login(locale));
+    }
     console.error(error);
     return null;
   }
 }
 
-const getDiagramUrl = async (fromDate: string, toDate: string, authToken: string) => {
+const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) => {
   const diagramUrl = apiRoutes.expensesDiagram(fromDate, toDate);
-  const response = await fetch(diagramUrl, {
-    headers: {
-      'auth-token': authToken,
-    },
-  });
-  if (!response.ok) {
+  try {
+    const diagram = await request(diagramUrl, {});
+    return diagram.image; // Base64 string
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login(locale));
+    }
+    console.error(error);
     return null;
   }
-  const { image } = await response.json();
-  return image; // Base64 string
 }
 
 export default async function ExpensesReportPage({ params, searchParams }: ExpensesReportPageProps) {
@@ -87,8 +90,8 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
 
   const [responseExpenses, responseAggregated, responseDiagram] = await Promise.all([
     getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale, t),
-    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, authToken),
-    getDiagramUrl(fromDateInitial, toDateInitial, authToken),
+    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
+    getDiagramUrl(fromDateInitial, toDateInitial, locale),
   ])
 
   if (!responseExpenses || !responseAggregated) {
