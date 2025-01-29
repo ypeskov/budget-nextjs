@@ -13,7 +13,7 @@ interface GoogleLoginProps {
 }
 
 const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({ locale }) => {
-  const { setUser } = useUser();
+  const { setUser, resetTimer } = useUser();
   const router = useRouter();
 
   const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
@@ -34,8 +34,9 @@ const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({ locale }) => {
     });
     const user = await userResponse.json();
     setUser({ email: user.email, token: jwt.accessToken });
+    resetTimer();
 
-    router.push(routes.accounts(locale));
+    router.push(routes.accounts({ locale }));
   };
 
   const handleLoginError = () => {

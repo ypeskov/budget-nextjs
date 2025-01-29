@@ -2,17 +2,39 @@
 
 import { Link } from "@/i18n/routing";
 import { useUser } from "@/context/UserContext";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function Header() {
-  const { user } = useUser();
+  const { user, expireTime } = useUser();
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
+  const t = useTranslations("");
+
+  useEffect(() => {
+    if (!expireTime) return;
+
+    const updateTimer = () => {
+      const remaining = Math.max(expireTime - Date.now(), 0);
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      setTimeLeft(`${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [expireTime]);
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row items-center justify-between mb-4">
         <div className="text-xl font-bold">AnotherBudgeter</div>
+        {timeLeft && <div className="text-sm text-gray-500">{t("sessionExpiresIn", { timeLeft })}</div>}
         <div className="mt-2 md:mt-0">
           <button className="p-2 hover:scale-110 transition">
-            <img src="/images/icons/settings-icon.svg" alt="Settings" title="Settings" className="h-6 w-6"/>
+            <img src="/images/icons/settings-icon.svg" alt="Settings" title="Settings" className="h-6 w-6" />
           </button>
         </div>
       </div>
@@ -48,10 +70,10 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login">
-                <img src="/images/icons/enter-icon.svg" alt="Login" title="Login" className="h-10 w-10 hover:scale-110 transition"/>
+                <img src="/images/icons/enter-icon.svg" alt="Login" title="Login" className="h-10 w-10 hover:scale-110 transition" />
               </Link>
               <Link href="/register">
-                <img src="/images/icons/register-icon.svg" alt="Register" title="Register" className="h-10 w-10 hover:scale-110 transition"/>
+                <img src="/images/icons/register-icon.svg" alt="Register" title="Register" className="h-10 w-10 hover:scale-110 transition" />
               </Link>
             </>
           )}

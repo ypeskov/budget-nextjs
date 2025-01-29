@@ -1,4 +1,4 @@
-import LoginPage from "@/components/login/page";
+import Login from "@/components/login/Login";
 
 type LoginPageParams = {
   params: Promise<{ locale: string }>
@@ -7,5 +7,5 @@ type LoginPageParams = {
 export default async function LoginServerPage({ params }: LoginPageParams) {
   const { locale } = await params;
 
-  return <LoginPage locale={locale} />;
+  return <Login locale={locale} />;
 }
