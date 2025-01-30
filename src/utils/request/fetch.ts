@@ -12,7 +12,7 @@ export async function request(url: string, options: RequestInit) {
 
       if (response.status === 422) {
         const error = await response.json();
-        throw new ValidationError(error.detail);
+        throw new ValidationError('Validation error', error.detail);
       }
 
       throw new Error('Unknown error', { cause: response });

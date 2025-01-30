@@ -61,13 +61,13 @@ export default {
     return `${basePath}/${transactionId}`;
   },
 
-  categories: (locale: string) => `/${locale}/categories`,
+  categories: ({ locale }: { locale?: string }) => `/${locale}/categories`,
 
-  reports: (locale: string) => `/${locale}/reports`,
+  reports: ({ locale }: { locale?: string }) => `/${locale}/reports`,
 
-  settings: (locale: string) => `/${locale}/settings`,
+  settings: ({ locale }: { locale?: string }) => `/${locale}/settings`,
 
-  expensesReport: (locale?: string, fromDate?: string, toDate?: string, hideEmptyCategories?: string) => {
+  expensesReport: ({ locale, fromDate, toDate, hideEmptyCategories }: { locale?: string, fromDate?: string, toDate?: string, hideEmptyCategories?: string }) => {
     const params = new URLSearchParams();
     if (fromDate) params.append('fromDate', fromDate);
     if (toDate) params.append('toDate', toDate);
@@ -78,23 +78,23 @@ export default {
     return queryString ? `${basePath}?${queryString}` : basePath;
   },
 
-  cashFlowReport: (locale?: string) => {
+  cashFlowReport: ({ locale }: { locale?: string }) => {
     const basePath = locale ? `/${locale}/reports/cash-flow` : `/reports/cash-flow`;
     return basePath;
   },
 
-  balanceReport: (locale?: string) => {
+  balanceReport: ({ locale }: { locale?: string }) => {
     const basePath = locale ? `/${locale}/reports/balance` : `/reports/balance`;
     return basePath;
   },
 
 
-  login: (locale?: string) => {
+  login: ({ locale }: { locale?: string }) => {
     const basePath = locale ? `/${locale}/login` : `/login`;
     return basePath;
   },
 
-  logout: (locale?: string) => {
+  logout: ({ locale }: { locale?: string }) => {
     const basePath = locale ? `/${locale}/logout` : `/logout`;
     return basePath;
   },

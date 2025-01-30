@@ -6,8 +6,11 @@ export class UnauthorizedError extends Error {
 }
 
 export class ValidationError extends Error {
-  constructor(message = 'Validation error') {
-    super(message);
+  detail: object;
+  
+  constructor(message = 'Validation error', detail: object) {
+    super(message); 
     this.name = 'ValidationError';
+    this.detail = detail;
   }
 }

@@ -29,4 +29,10 @@ export default {
   },
   
   baseCurrency: () => `${API_URL}/settings/base-currency`,
+
+  accountTypes: () => `${API_URL}/accounts/types/`,
+
+  currencies: () => `${API_URL}/currencies/`,
+
+  setArchiveStatus: () => `${API_URL}/accounts/set-archive-status`,
 };

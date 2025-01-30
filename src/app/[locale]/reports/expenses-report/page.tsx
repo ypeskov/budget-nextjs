@@ -11,7 +11,7 @@ import { UnauthorizedError } from "@/utils/request/errors";
 import { AggregatedExpense } from "@/types/reports";
 
 type ExpensesReportPageProps = {
-  searchParams: Promise<Record<string, string | undefined>>;
+  searchParams: Record<string, string | undefined>;
   locale: string;
 }
 

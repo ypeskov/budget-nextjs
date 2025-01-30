@@ -6,23 +6,22 @@ import { CREDIT_CARD_ACCOUNT_TYPE_ID } from "@/constants";
 import { Account } from "@/types/accounts";
 import { useState } from "react";
 import AccountForm from "@/components/accounts/AccountForm";
-import { getCookie } from "@/utils/cookies";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/utils/amount";
 import ConfirmPopup from "../common/ConfirmPopup";
+import { getCookie } from "@/utils/cookies";
+import apiRoutes from "@/routes/apiRoutes";
+import { request } from "@/utils/request/browser";
 
 interface AccountDetailsProps {
   account: Account;
   locale: string;
 }
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export default function AccountDetails({ account, locale }: AccountDetailsProps) {
   const t = useTranslations('');
   const [showEditForm, setShowEditForm] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false); // State for popup visibility
-  const availableBalanceCC = account.balance + account.creditLimit;
   const router = useRouter();
 
   const formattedBalance = account.balance
@@ -48,7 +47,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
   const confirmDelete = () => {
     const authToken = getCookie('authToken');
     const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-    fetch(`${apiBaseUrl}/accounts/${account.id}`, {
+    request(apiRoutes.account(account.id), {
       method: 'DELETE',
       headers: headers,
     })
@@ -68,10 +67,6 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
       });
   };
 
-  const confirmArchive = () => {
-    console.log('confirmArchive');
-  }
-
   const cancelDelete = () => {
     setShowConfirmPopup(false); // Close the delete confirmation popup
   };
@@ -84,6 +79,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
             {t('account')}: <strong>{account.name}</strong>
           </span>
           <button className="text-blue-500">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/icons/edit-icon.svg"
               alt={t('editAccount')}
@@ -102,6 +98,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
             )}
           </span>
           <button className="text-red-500">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/icons/delete-icon.svg"
               alt={t('deleteAccount')}
@@ -128,7 +125,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
           message={t('deleteAccountConfirmation')}
           cancelButtonText={t('cancel')}
           confirmButtonText={t('confirm')}
-          onConfirm={confirmArchive}
+          onConfirm={confirmDelete}
           onCancel={cancelDelete}
         />
       )}
