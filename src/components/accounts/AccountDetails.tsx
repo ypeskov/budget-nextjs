@@ -9,9 +9,9 @@ import AccountForm from "@/components/accounts/AccountForm";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/utils/amount";
 import ConfirmPopup from "../common/ConfirmPopup";
-import { getCookie } from "@/utils/cookies";
 import apiRoutes from "@/routes/apiRoutes";
 import { request } from "@/utils/request/browser";
+import routes from "@/routes/routes";
 
 interface AccountDetailsProps {
   account: Account;
@@ -20,6 +20,7 @@ interface AccountDetailsProps {
 
 export default function AccountDetails({ account, locale }: AccountDetailsProps) {
   const t = useTranslations('');
+  const [error, setError] = useState<string | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false); // State for popup visibility
   const router = useRouter();
@@ -44,27 +45,19 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
     setShowConfirmPopup(true); // Show the popup
   };
 
-  const confirmDelete = () => {
-    const authToken = getCookie('authToken');
-    const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-    request(apiRoutes.account(account.id), {
-      method: 'DELETE',
-      headers: headers,
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log('Account deleted');
-          router.push(`/${locale}/accounts`);
-        } else {
-          console.error('Error deleting account');
-        }
+  const confirmDelete = async () => {
+    try {
+      const response = await request(apiRoutes.account(account.id), {
+        method: 'DELETE',
       })
-      .catch((error) => {
-        console.error('Error deleting account', error);
-      })
-      .finally(() => {
-        setShowConfirmPopup(false); // Close the popup
-      });
+      if (response.deleted) {
+        router.push(routes.accounts({ locale }));
+      } else {
+        setError('Error deleting account');
+      }
+    } catch (error) {
+      setError('Error deleting account');
+    }
   };
 
   const cancelDelete = () => {

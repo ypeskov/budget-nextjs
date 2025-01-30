@@ -3,6 +3,7 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useAuthTimer } from "@/hooks/authHook";
 import { request } from "@/utils/request/browser";
+import apiRoutes from "@/routes/apiRoutes";
 
 interface User {
   email: string | null;
@@ -49,7 +50,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
       try {
         console.log('fetching user profile');
-        const userProfileResponse = await request(`${API_URL}/auth/profile`, {});
+        const userProfileResponse = await request(apiRoutes.profile(), {});
         setUser({ email: userProfileResponse.email, token });
         resetTimer();
       } catch (error) {
