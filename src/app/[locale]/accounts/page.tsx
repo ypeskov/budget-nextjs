@@ -23,10 +23,8 @@ export default async function AccountsPage({
     archivedOnly: awaitedSearchParams.archivedOnly === "true" ? "true" : "false",
   });
   const accountsUrl = `${apiRoutes.accounts()}?${accountsSearchParams.toString()}`;
-  console.log(accountsUrl);
   const baseCurrencyUrl = apiRoutes.baseCurrency();
-  console.log(baseCurrencyUrl);
-  
+
   // Fetch accounts and base currency on the server
   const [accounts, baseCurrency]: [Accounts, BaseCurrency] = await Promise.all([
     request(accountsUrl, {  cache: 'no-store' }),

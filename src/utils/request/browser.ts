@@ -17,12 +17,12 @@ export async function request(url: string, options: RequestInit) {
     return await response.json();
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      console.log("Unauthorized", error);
+      console.log("Unauthorized", JSON.stringify(error));
       throw error;
     }
 
     if (error instanceof ValidationError) {
-      console.log("Validation error", error);
+      console.log("Validation error", JSON.stringify(error));
       throw error;
     }
 

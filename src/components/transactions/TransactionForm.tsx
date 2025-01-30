@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { Transaction } from "@/types/transactions";
 import { useEffect, useState } from "react";
 import ApiRoutes from "@/routes/apiRoutes";
-import { getCookie } from "@/utils/cookies";
 import { Account } from "@/types/accounts";
 import { Category } from "@/types/categories";
 import { DateTime } from "luxon";
@@ -12,7 +11,7 @@ import { useRouter } from "next/navigation";
 import routes from "@/routes/routes";
 import { request } from "@/utils/request/browser";
 
-interface TransactionFormProps {
+type TransactionFormProps = {
   locale: string;
   closeForm: () => void;
   transaction?: Transaction;
@@ -52,20 +51,17 @@ const fetchCategories = async () => {
 
 
 const submitTransaction = async (transactionRequest: TransactionRequest, isNewTransaction: boolean): Promise<Transaction | null> => {
-  const authToken = getCookie('authToken');
-  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-
   const method = isNewTransaction ? 'POST' : 'PUT';
-  const response = await fetch(ApiRoutes.submitTransaction(), {
-    method,
-    headers: { "Content-Type": "application/json", ...headers },
-    body: JSON.stringify(transactionRequest),
-  });
-  if (response.ok) {
-    return response.json();
+  try {
+    const response = await request(ApiRoutes.submitTransaction(), {
+      method,
+      body: JSON.stringify(transactionRequest),
+    });
+    return response;
+  } catch (error) {
+    console.error('Failed to submit transaction', error);
+    return null;
   }
-  console.error(response);
-  return null;
 };
 
 export const TransactionForm = ({ locale, closeForm, transaction }: TransactionFormProps) => {
@@ -103,11 +99,12 @@ export const TransactionForm = ({ locale, closeForm, transaction }: TransactionF
       }
       const cats = await fetchCategories();
       if (cats) {
-        setExpenseCategories(cats.expenseCategories);
-        setIncomeCategories(cats.incomeCategories);
+        setExpenseCategories(cats.filter((cat: Category) => cat.isIncome === false));
+        setIncomeCategories(cats.filter((cat: Category) => cat.isIncome === true));
       } else {
         console.error('Failed to fetch categories');
-        throw new Error('Failed to fetch categories');
+        setExpenseCategories([]);
+        setIncomeCategories([]);
       }
     }
     fetchData();
@@ -282,7 +279,6 @@ export const TransactionForm = ({ locale, closeForm, transaction }: TransactionF
               </div>
             </>
           )}
-
           {/* Category */}
           {transactionType !== 'transfer' && (
             <div>

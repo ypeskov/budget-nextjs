@@ -36,9 +36,6 @@ export default async function TransactionPage({ params }: TransactionPageProps) 
   const locale = resolvedParams.locale;
 
   let transaction: Transaction | null = null;
-  console.log('--------------------------------');
-  console.log('TransactionPage', id);
-  console.log('--------------------------------');
   transaction = await fetchTransaction(id);
 
   return (

@@ -17,7 +17,7 @@ export async function request(url: string, options: RequestInit) {
     return await response.json();
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      console.log('Unauthorized');
+      console.log('Unauthorized', JSON.stringify(error));
       throw error;
     }
     if (error instanceof ValidationError) {
