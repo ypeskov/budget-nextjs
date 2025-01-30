@@ -17,9 +17,9 @@ export default function DatePicker({ date, label, isStartDate, locale, fromDate,
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (isStartDate) {
-      router.push(routes.expensesReport(locale, event.target.value, toDate));
+      router.push(routes.expensesReport({ locale, fromDate: event.target.value, toDate }));
     } else {
-      router.push(routes.expensesReport(locale, fromDate, event.target.value));
+      router.push(routes.expensesReport({ locale, fromDate, toDate: event.target.value }));
     }
   };
 

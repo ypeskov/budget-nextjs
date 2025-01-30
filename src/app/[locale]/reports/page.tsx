@@ -9,13 +9,13 @@ export default async function ReportsPage() {
     <>
       <div>
         <ul className="space-y-4">
-          <Link href={routes.cashFlowReport()}>
+          <Link href={routes.cashFlowReport({})}>
             <li className="menu-item text-xl">{t('cashFlowReport')}</li>
           </Link>
-          <Link href={routes.balanceReport()}>
+          <Link href={routes.balanceReport({})}>
             <li className="menu-item text-xl">{t('balanceReport')}</li>
           </Link>
-          <Link href={routes.expensesReport()}>
+          <Link href={routes.expensesReport({})}>
             <li className="menu-item text-xl">{t('expensesReport')}</li>
           </Link>
         </ul>

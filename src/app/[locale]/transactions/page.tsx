@@ -24,7 +24,7 @@ async function fetchWithErrorHandling(url: string): Promise<Transaction[] | Acco
     return response;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login());
+      redirect(routes.login({}));
     }
     return null;
   }

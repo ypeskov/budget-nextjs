@@ -1,4 +1,4 @@
-export default {
+const routes = {
   accounts: ({ locale,
     archivedOnly = false,
     includeHidden = false,
@@ -99,3 +99,5 @@ export default {
     return basePath;
   },
 };
+
+export default routes;

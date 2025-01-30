@@ -1,7 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
-export default {
+const apiRoutes = {
   login: () => `${API_URL}/auth/login`,
   oauth: () => `${API_URL}/auth/oauth`,
   profile: () => `${API_URL}/auth/profile`,
@@ -36,3 +36,5 @@ export default {
 
   setArchiveStatus: () => `${API_URL}/accounts/set-archive-status`,
 };
+
+export default apiRoutes;

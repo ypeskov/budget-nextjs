@@ -16,7 +16,7 @@ export default function EmptyCategoriesChecker({ hideEmptyCategories, locale, fr
   const router = useRouter();
 
   const handleHideEmptyCategories = () => {
-    router.push(routes.expensesReport(locale, fromDate, toDate, !hideEmptyCategories ? 'true' : 'false'));
+    router.push(routes.expensesReport({ locale, fromDate, toDate, hideEmptyCategories: !hideEmptyCategories ? 'true' : 'false' }));
   };
 
   return (

@@ -35,7 +35,7 @@ export default function Header() {
         {timeLeft && <div className="text-sm text-gray-500">{t("sessionExpiresIn", { timeLeft })}</div>}
         <div className="mt-2 md:mt-0">
           <button className="p-2 hover:scale-110 transition">
-            <img src="/images/icons/settings-icon.svg" alt="Settings" title="Settings" className="h-6 w-6" />
+            <Image src="/images/icons/settings-icon.svg" alt="Settings" title="Settings" className="h-6 w-6" width={24} height={24} />
           </button>
         </div>
       </div>
@@ -58,9 +58,9 @@ export default function Header() {
               <Link href="/reports">
                 <Image src="/images/icons/reports-icon.svg" alt="Reports" title="Reports" className="h-10 w-10 hover:scale-110 transition" width={40} height={40} />
               </Link>
-              <Link href="/budgets">
+              {/* <Link href="/budgets">
                 <Image src="/images/icons/budgets-icon.svg" alt="Budgets" title="Budgets" className="h-10 w-10 hover:scale-110 transition" width={40} height={40} />
-              </Link>
+              </Link> */}
             </>)}
           {user.token ? (
             <>
@@ -73,9 +73,9 @@ export default function Header() {
               <Link href="/login">
                 <Image src="/images/icons/enter-icon.svg" alt="Login" title="Login" className="h-10 w-10 hover:scale-110 transition" width={40} height={40} />
               </Link>
-              <Link href="/register">
+              {/* <Link href="/register">
                 <Image src="/images/icons/register-icon.svg" alt="Register" title="Register" className="h-10 w-10 hover:scale-110 transition" width={40} height={40} />
-              </Link>
+              </Link> */}
             </>
           )}
         </nav>

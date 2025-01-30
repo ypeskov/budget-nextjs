@@ -11,8 +11,8 @@ import { UnauthorizedError } from "@/utils/request/errors";
 import { AggregatedExpense } from "@/types/reports";
 
 type ExpensesReportPageProps = {
-  searchParams: Record<string, string | undefined>;
-  locale: string;
+  searchParams: Promise<Record<string, string | undefined>>;
+  params: Promise<{ locale: string }>
 }
 
 const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
@@ -63,14 +63,16 @@ const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) =
     return diagram.image; // Base64 string
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login({ locale }));
+      redirect(routes.login({ locale: locale }));
     }
     console.error(error);
     return null;
   }
 }
 
-export default async function ExpensesReportPage({ searchParams, locale }: ExpensesReportPageProps) {
+async function ExpensesReportPage({ searchParams, params }: ExpensesReportPageProps) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
   const t = await getTranslations('');
   const awaitedSearchParams = await searchParams;
   const fromDateInitial = awaitedSearchParams.fromDate || new Date(new Date().setDate(1)).toISOString().split('T')[0];
@@ -150,3 +152,5 @@ export default async function ExpensesReportPage({ searchParams, locale }: Expen
     </>
   );
 }
+
+export default ExpensesReportPage;

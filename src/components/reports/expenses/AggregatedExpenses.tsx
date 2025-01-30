@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { amountPrecision } from "@/i18n/utils";
+import { AggregatedExpense } from "@/types/reports";
 
 interface AggregatedExpensesProps {
-  aggregatedCategories: any;
+  aggregatedCategories: AggregatedExpense[];
   aggregatedSum: number;
   currencyCode: string;
 }
@@ -13,7 +14,7 @@ export default async function AggregatedExpenses({ aggregatedCategories, aggrega
   return (
     <div className="w-full">
       <ul className="list-none">
-        {aggregatedCategories.map((category: any) => (
+        {aggregatedCategories.map((category: AggregatedExpense) => (
           <li key={category.category_id} className="flex justify-between py-2 rounded-lg shadow p-4 transition my-2">
             <span>{category.label}</span>
             <span>
