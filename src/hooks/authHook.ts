@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import routes from "@/routes/routes";
 
@@ -11,25 +11,25 @@ export function useAuthTimer(locale: string) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const counterRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  function logout() {
+  const logout = useCallback(() => {
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    router.push(routes.login(locale));
-  }
+    router.push(routes.login({ locale }));
+  }, [router, locale]);
 
-  function resetTimer() {
+  const resetTimer = useCallback(() => {
     const newExpireTime = Date.now() + SESSION_TIMEOUT;
     setExpireTime(newExpireTime);
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-
+  
     timerRef.current = setTimeout(() => {
       logout();
     }, SESSION_TIMEOUT);
-
+  
     if (counterRef.current) clearInterval(counterRef.current);
-  }
+  }, [logout]);
 
   useEffect(() => {
     if (!expireTime) return;
@@ -47,7 +47,7 @@ export function useAuthTimer(locale: string) {
     }
 
     return () => { };
-  }, [expireTime]);
+  }, [expireTime, logout]);
 
   return { expireTime, resetTimer };
 }

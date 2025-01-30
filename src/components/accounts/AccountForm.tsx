@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DateTime } from "luxon";
 import { Account } from "@/types/accounts";
-import { getCookie } from "@/utils/cookies";
 import { useTranslations } from "next-intl";
-import routes from "@/routes/routes"; 
-import ConfirmPopup from "../common/ConfirmPopup";
+import routes from "@/routes/routes";
+import ConfirmPopup from "@/components/common/ConfirmPopup";
+import { request } from "@/utils/request/browser";
+import apiRoutes from "@/routes/apiRoutes";
+import { UnauthorizedError, ValidationError } from "@/utils/request/errors";
 
 interface EditAccountProps {
   account?: Account;
@@ -15,19 +17,17 @@ interface EditAccountProps {
   locale: string;
 }
 
-interface AccountType {
+type AccountType = {
   id: number;
   type_name: string;
   is_credit: boolean;
 }
 
-interface Currency {
+type Currency = {
   id: number;
   code: string;
   name: string;
 }
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const parseLocalizedNumber = (value: string): number => {
   const cleanedValue = value.replace(/[^\d.,]/g, '');
@@ -67,8 +67,6 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
   const [currencies, setCurrencies] = useState([]);
   const [showConfirmPopupArchive, setShowConfirmPopupArchive] = useState(false);
-  const authToken = getCookie("authToken");
-  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
 
   useEffect(() => {
     if (account) {
@@ -81,24 +79,28 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
       setIsHidden(account.isHidden);
       setShowInReports(account.showInReports);
     }
-  }, [account]);
+  }, [account, formattedBalance, formattedCreditLimit]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const types: AccountType[] = await fetch(`${apiBaseUrl}/accounts/types/`, { headers })
-          .then((res) => res.json());
-        const currencies = await fetch(`${apiBaseUrl}/currencies/`, { headers })
-          .then((res) => res.json());
+        const types: AccountType[] = await request(apiRoutes.accountTypes(), {});
+        const currencies = await request(apiRoutes.currencies(), {});
         setAccountTypes(types);
         setCurrencies(currencies);
       } catch (error) {
-        console.error("Failed to fetch data", error);
+        if (error instanceof UnauthorizedError) {
+          router.push(routes.login({ locale }));
+        } else if (error instanceof ValidationError) {
+          setError(error.message);
+        } else {
+          console.error("Failed to fetch data", error);
+        }
       }
     }
 
     fetchData();
-  }, []);
+  }, [locale, router]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,58 +120,39 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
     };
 
     try {
-      headers["auth-token"] = authToken || "";
-      headers["Content-Type"] = "application/json";
+      const url = account ? apiRoutes.account(account.id) : apiRoutes.accounts();
+      const method = account ? "PUT" : "POST";
 
-      if (account) {
-        // PUT to update existing account
-        const response = await fetch(`${apiBaseUrl}/accounts/${account.id}`, {
-          method: "PUT",
-          headers: headers,
-          body: JSON.stringify(accountData),
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to update account: ${response.statusText}`);
-        }
-        router.push(`/${locale}/accountDetails/${account.id}`);
-      } else {
-        // POST to create new account
-        const response = await fetch(`${apiBaseUrl}/accounts/`, {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(accountData),
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to create account: ${response.statusText}`);
-        }
-        const accountCreated = await response.json();
-        router.push(`/${locale}/accountDetails/${accountCreated.id}`);
-      }
+      const newAccount = await request(url, {
+        method,
+        body: JSON.stringify(accountData),
+      });
+
+      router.push(routes.accountDetails({ locale, accountId: newAccount.id }));
       closeForm();
     } catch (error) {
-      console.error("Failed to submit form");
-      setError(t('addError'));
+      if (error instanceof ValidationError) {
+        setError(error.message);
+      } else {
+        console.error(error);
+        setError(t('addError'));
+      }
     }
   };
 
   const confirmArchive = async () => {
-    const headers = {
-      ...(authToken && { "auth-token": authToken }),
-      "Content-Type": "application/json",
-    };
-    const response = await fetch(`${apiBaseUrl}/accounts/set-archive-status`, {
+    const response = await request(apiRoutes.setArchiveStatus(), {
       method: "PUT",
-      headers,
       body: JSON.stringify({
         accountId: account?.id,
         isArchived: true
       }),
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to archive account: ${response.statusText}`);
+    if (!response) {
+      throw new Error(`Failed to archive account`);
     }
-    router.push(routes.accounts(locale, true, false, true));
+
+    router.push(routes.accounts({ locale, archivedOnly: true }));
   }
 
   const cancelArchive = () => {

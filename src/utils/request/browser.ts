@@ -19,7 +19,7 @@ export async function request(url: string, options: RequestInit) {
     }
 
     if (error instanceof ValidationError) {
-      console.log("Validation error", error);
+      console.log("Validation error", error.detail);
       throw error;
     }
 

@@ -9,12 +9,15 @@ import { request } from "@/utils/request/browser";
 import apiRoutes from "@/routes/apiRoutes";
 import routes from "@/routes/routes";
 
-interface FormData {
+const SESSION_TIMEOUT_MINUTES = parseInt(process.env.NEXT_PUBLIC_SESSION_TIMEOUT || "30", 10);
+const SESSION_TIMEOUT_SECONDS = SESSION_TIMEOUT_MINUTES * 60;
+
+type FormData = {
   email: string;
   password: string;
 }
 
-interface LoginPageProps {
+type LoginPageProps = {
   locale: string;
 }
 
@@ -43,7 +46,7 @@ export default function LoginPage({ locale }: LoginPageProps) {
       });
 
       const accessToken: string = loginToken.accessToken;
-      document.cookie = `authToken=${accessToken}; path=/; max-age=3600;`;
+      document.cookie = `authToken=${accessToken}; path=/; max-age=${SESSION_TIMEOUT_SECONDS};`;
       
       const userProfile = await request(apiRoutes.profile(), {});
 

@@ -2,7 +2,7 @@ import { Account } from "@/types/accounts";
 import { Category } from "@/types/categories";
 import { User } from "@/types/users";
 
-export interface Transaction {
+export type Transaction = {
   id: number;
   userId: number;
   accountId: number;

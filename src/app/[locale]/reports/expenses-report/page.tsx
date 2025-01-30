@@ -1,6 +1,5 @@
-import apiRoutes from "@/routes/apiRoutes";
-import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
+import apiRoutes from "@/routes/apiRoutes";
 import AggregatedExpenses from "@/components/reports/expenses/AggregatedExpenses";
 import DatePicker from "@/components/reports/expenses/DatePicker";
 import CategoriesExpenses from "@/components/reports/expenses/CategoriesExpenses";
@@ -9,14 +8,14 @@ import { request } from "@/utils/request/api";
 import { redirect } from "next/navigation";
 import routes from "@/routes/routes";
 import { UnauthorizedError } from "@/utils/request/errors";
+import { AggregatedExpense } from "@/types/reports";
 
 type ExpensesReportPageProps = {
-  params: Promise<Record<string, string | undefined>>;
   searchParams: Promise<Record<string, string | undefined>>;
-  locale: string;
+  params: Promise<{ locale: string }>
 }
 
-const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string, t: any) => {
+const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
   try {
     const expenses = await request(apiRoutes.expenses(), {
       method: 'POST',
@@ -29,7 +28,7 @@ const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories
     return expenses;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale }));
     }
     console.error(error);
     return null;
@@ -38,7 +37,7 @@ const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories
 
 const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
   try {
-    const response = await request(apiRoutes.expensesAggregate(), {
+    const aggregatedExpenses = await request(apiRoutes.expensesAggregate(), {
       method: 'POST',
       body: JSON.stringify({
         startDate: fromDate,
@@ -47,10 +46,10 @@ const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmpty
       }),
     });
 
-    return response;
+    return aggregatedExpenses;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale }));
     }
     console.error(error);
     return null;
@@ -64,20 +63,18 @@ const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) =
     return diagram.image; // Base64 string
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale: locale }));
     }
     console.error(error);
     return null;
   }
 }
 
-export default async function ExpensesReportPage({ params, searchParams }: ExpensesReportPageProps) {
+async function ExpensesReportPage({ searchParams, params }: ExpensesReportPageProps) {
   const resolvedParams = await params;
-  const locale = resolvedParams.locale || 'en';
-  const awaitedSearchParams = await searchParams;
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('authToken')?.value || '';
+  const locale = resolvedParams.locale;
   const t = await getTranslations('');
+  const awaitedSearchParams = await searchParams;
   const fromDateInitial = awaitedSearchParams.fromDate || new Date(new Date().setDate(1)).toISOString().split('T')[0];
   const toDateInitial = awaitedSearchParams.toDate || new Date().toISOString().split('T')[0];
 
@@ -89,7 +86,7 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
   }
 
   const [responseExpenses, responseAggregated, responseDiagram] = await Promise.all([
-    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale, t),
+    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
     getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
     getDiagramUrl(fromDateInitial, toDateInitial, locale),
   ])
@@ -101,7 +98,7 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
     </div>);
   }
 
-  const aggregatedSum = responseAggregated.reduce((sum: number, category: any) => sum + category.amount, 0);
+  const aggregatedSum = responseAggregated.reduce((sum: number, category: AggregatedExpense) => sum + category.amount, 0);
 
   return (
     <>
@@ -134,6 +131,7 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
       {aggregatedSum > 0 && (
         <div className="mb-4 flex">
           <div className="w-1/2 flex justify-center items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={responseDiagram || ''} alt={t("diagram")} />
           </div>
 
@@ -154,3 +152,5 @@ export default async function ExpensesReportPage({ params, searchParams }: Expen
     </>
   );
 }
+
+export default ExpensesReportPage;

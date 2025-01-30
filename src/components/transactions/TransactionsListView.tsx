@@ -46,7 +46,7 @@ export default function TransactionsListView({ transactions, locale, searchParam
     } catch (error) {
       if (error instanceof UnauthorizedError) {
         console.log("Unauthorized");
-        router.push(routes.login(locale));
+        router.push(routes.login({ locale }));
       }
 
       if (error instanceof ValidationError) {
@@ -57,7 +57,7 @@ export default function TransactionsListView({ transactions, locale, searchParam
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, page, searchParams]);
+  }, [loading, hasMore, page, searchParams, locale, router]);
 
   useEffect(() => {
     const handleScroll = () => {

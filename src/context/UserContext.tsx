@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useAuthTimer } from "@/hooks/authHook";
+import { request } from "@/utils/request/browser";
 
 interface User {
   email: string | null;
@@ -27,34 +28,30 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const { expireTime, resetTimer } = useAuthTimer('en');
+
+  const { expireTime, resetTimer: originalResetTimer } = useAuthTimer("en");
+  const resetTimer = useMemo(() => () => originalResetTimer(), [originalResetTimer]);
+
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
     const loadUserProfile = async () => {
-      const token = document.cookie
+      const tokenFromCookie = document.cookie
         .split("; ")
         .find((row) => row.startsWith("authToken="))
         ?.split("=")[1];
 
-      if (!token) {
+      if (!tokenFromCookie) {
         setUser(null);
         return;
       }
+      setToken(tokenFromCookie);
 
       try {
-        const userResponse = await fetch(`${API_URL}/auth/profile`, {
-          headers: {
-            "auth-token": token,
-          },
-        });
-
-        if (userResponse.ok) {
-          const response = await userResponse.json();
-          setUser({ email: response.email, token });
-          resetTimer();
-        } else {
-          console.error("Failed to fetch user profile");
-          setUser(null);
-        }
+        console.log('fetching user profile');
+        const userProfileResponse = await request(`${API_URL}/auth/profile`, {});
+        setUser({ email: userProfileResponse.email, token });
+        resetTimer();
       } catch (error) {
         console.error("Error fetching user profile:", error);
         setUser(null);
@@ -62,7 +59,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadUserProfile();
-  }, []);
+  }, [token, resetTimer]);
 
   return (
     <UserContext.Provider value={{ user: user || defaultUser, setUser, expireTime, resetTimer }}>

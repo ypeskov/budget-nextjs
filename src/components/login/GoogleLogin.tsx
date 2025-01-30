@@ -5,11 +5,19 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import apiRoutes from "@/routes/apiRoutes";
 import routes from "@/routes/routes";
-// const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+import { request } from "@/utils/request/browser";
 
-interface GoogleLoginProps {
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+const SESSION_TIMEOUT_MINUTES = parseInt(process.env.NEXT_PUBLIC_SESSION_TIMEOUT || "30", 10);
+const SESSION_TIMEOUT_SECONDS = SESSION_TIMEOUT_MINUTES * 60;
+
+type GoogleLoginProps = {
   locale: string;
+}
+
+type LoginResponse = {
+  accessToken: string;
+  tokenType: string;
 }
 
 const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({ locale }) => {
@@ -17,23 +25,15 @@ const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({ locale }) => {
   const router = useRouter();
 
   const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
-    const response = await fetch(apiRoutes.oauth(), {
+    const loginResponse: LoginResponse = await request(apiRoutes.oauth(), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ credential: credentialResponse.credential }),
     });
-    const jwt = await response.json();
-    document.cookie = `authToken=${jwt.accessToken}; path=/; max-age=3600;`;
+    document.cookie = `authToken=${loginResponse.accessToken}; path=/; max-age=${SESSION_TIMEOUT_SECONDS};`;
 
-    const userResponse = await fetch(apiRoutes.profile(), {
-      headers: {
-        "auth-token": jwt.accessToken,
-      },
-    });
-    const user = await userResponse.json();
-    setUser({ email: user.email, token: jwt.accessToken });
+    const userResponse = await request(apiRoutes.profile(), {});
+
+    setUser({ email: userResponse.email, token: loginResponse.accessToken });
     resetTimer();
 
     router.push(routes.accounts({ locale }));
