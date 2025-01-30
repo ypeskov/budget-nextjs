@@ -1,43 +1,45 @@
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import TransactionsListView from '@/components/transactions/TransactionsListView';
-import { getAuthToken } from '@/utils/auth';
 import { Transaction } from '@/types/transactions';
 import { prepareRequestUrl } from '@/utils/transactions';
 import TransactionsFilter from '@/components/transactions/TransactionsFilter';
 import { Account } from '@/types/accounts';
 import { TransactionsMenu } from '@/components/transactions/TransactionsMenu';
+import { request } from '@/utils/request/api';
+import apiRoutes from '@/routes/apiRoutes';
+import { UnauthorizedError } from '@/utils/request/errors';
+import routes from '@/routes/routes';
+import { redirect } from 'next/navigation';
 
 interface TransactionsPageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+async function fetchWithErrorHandling(url: string): Promise<Transaction[] | Account[] | null> {
+  try {
+    const response = await request(url, { cache: "no-store" });
 
-async function fetchWithErrorHandling(url: string): Promise<any> {
-  const response = await fetch(url, {
-    headers: { "auth-token": await getAuthToken() },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`HTTP ${response.status}: ${error.detail || 'Error occurred'}`);
+    return response;
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(routes.login());
+    }
+    return null;
   }
-
-  return response.json();
 }
 
 async function fetchTransactions(searchParams: Record<string, string | undefined>): Promise<Transaction[]> {
   const transactionsUrl = prepareRequestUrl(1, searchParams); // get only the first page of transactions
   const transactions = await fetchWithErrorHandling(transactionsUrl);
-  return transactions;
+  return transactions as Transaction[];
 }
 
 async function fetchAccounts(): Promise<Account[]> {
-  const accountsUrl = `${apiBaseUrl}/accounts?includeHidden=true`;
-  return fetchWithErrorHandling(accountsUrl);
+  const accountsUrl = apiRoutes.accounts();
+  const accounts = await fetchWithErrorHandling(accountsUrl);
+  return accounts as Account[];
 }
 
 const TransactionsPage = async ({ params, searchParams }: TransactionsPageProps) => {

@@ -2,8 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import routes from "@/routes/routes";
 
-type ReportsPageProps = {}
-
 export default async function ReportsPage() {
   const t = await getTranslations('');
 
