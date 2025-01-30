@@ -100,7 +100,7 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
     }
 
     fetchData();
-  }, []);
+  }, [locale, router]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +151,7 @@ const NewAccount: React.FC<EditAccountProps> = ({ account, closeForm, locale }) 
     if (!response) {
       throw new Error(`Failed to archive account`);
     }
-    
+
     router.push(routes.accounts({ locale, archivedOnly: true }));
   }
 

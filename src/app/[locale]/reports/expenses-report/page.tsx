@@ -28,7 +28,7 @@ const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories
     return expenses;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale }));
     }
     console.error(error);
     return null;
@@ -49,7 +49,7 @@ const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmpty
     return aggregatedExpenses;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale }));
     }
     console.error(error);
     return null;
@@ -63,7 +63,7 @@ const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) =
     return diagram.image; // Base64 string
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login(locale));
+      redirect(routes.login({ locale }));
     }
     console.error(error);
     return null;
