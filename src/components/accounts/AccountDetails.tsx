@@ -56,6 +56,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
         setError('Error deleting account');
       }
     } catch (error) {
+      console.error('Error deleting account', error);
       setError('Error deleting account');
     }
   };
@@ -67,6 +68,7 @@ export default function AccountDetails({ account, locale }: AccountDetailsProps)
   return (
     <>
       <div className="info-card">
+        {error && <div className="text-red-500">{error}</div>}
         <div className="flex justify-between items-center">
           <span>
             {t('account')}: <strong>{account.name}</strong>

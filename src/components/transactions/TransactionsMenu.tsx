@@ -5,7 +5,7 @@ import routes from "@/routes/routes";
 import { TransactionForm } from "./TransactionForm";
 import { Transaction } from "@/types/transactions";
 
-interface TransactionsMenuProps {
+type TransactionsMenuProps = {
   locale: string;
   isNewTransaction: boolean;
   transaction?: Transaction;

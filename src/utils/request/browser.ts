@@ -2,7 +2,10 @@ import { getCookie } from "@/utils/cookies";
 import { request as clientRequest } from "@/utils/request/fetch";
 import { UnauthorizedError, ValidationError } from "./errors";
 
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 export async function request(url: string, options: RequestInit) {
+  url = API_URL + url;
   const token = getCookie("authToken");
   const headers = {
     "Content-Type": "application/json",
@@ -19,11 +22,11 @@ export async function request(url: string, options: RequestInit) {
     }
 
     if (error instanceof ValidationError) {
-      console.log("Validation error", error.detail);
+      console.log("Validation error", error);
       throw error;
     }
 
     console.error(error);
-    return null;
+    throw error;
   }
 }

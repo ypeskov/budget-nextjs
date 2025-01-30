@@ -25,7 +25,6 @@ const UserContext = createContext<UserContextType>({
 });
 
 const defaultUser: User = { email: null, token: null };
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -49,7 +48,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setToken(tokenFromCookie);
 
       try {
-        console.log('fetching user profile');
         const userProfileResponse = await request(apiRoutes.profile(), {});
         setUser({ email: userProfileResponse.email, token });
         resetTimer();

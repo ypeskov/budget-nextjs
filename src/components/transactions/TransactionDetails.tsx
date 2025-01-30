@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { TransactionsMenu } from "./TransactionsMenu";
 import { formatAmount } from "@/utils/amount";
 
-interface TransactionDetailsProps {
+type TransactionDetailsProps = {
   locale: string;
   transaction: Transaction;
 }

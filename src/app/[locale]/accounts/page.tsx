@@ -2,8 +2,7 @@ import { BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 import FilterControls from "@/components/accounts/FilterControls";
 import { request } from "@/utils/request/api";
-import routes from "@/routes/apiRoutes";
-import { getAuthToken } from "@/utils/auth";
+import apiRoutes from "@/routes/apiRoutes";
 
 type AccountsPageParams = {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -17,20 +16,21 @@ export default async function AccountsPage({
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
   const awaitedSearchParams = await searchParams;
-  const authToken = await getAuthToken();
 
   const accountsSearchParams = new URLSearchParams({
     includeHidden: awaitedSearchParams.includeHidden === "true" ? "true" : "false",
     includeArchived: awaitedSearchParams.includeArchived === "true" ? "true" : "false",
     archivedOnly: awaitedSearchParams.archivedOnly === "true" ? "true" : "false",
   });
-  const accountsUrl = `${routes.accounts()}?${accountsSearchParams.toString()}`;
-  const baseCurrencyUrl = routes.baseCurrency();
-
+  const accountsUrl = `${apiRoutes.accounts()}?${accountsSearchParams.toString()}`;
+  console.log(accountsUrl);
+  const baseCurrencyUrl = apiRoutes.baseCurrency();
+  console.log(baseCurrencyUrl);
+  
   // Fetch accounts and base currency on the server
   const [accounts, baseCurrency]: [Accounts, BaseCurrency] = await Promise.all([
-    request(accountsUrl, { headers: { 'auth-token': authToken }, cache: 'no-store' }),
-    request(baseCurrencyUrl, { headers: { 'auth-token': authToken }, cache: 'force-cache' }),
+    request(accountsUrl, {  cache: 'no-store' }),
+    request(baseCurrencyUrl, { cache: 'force-cache' }),
   ]);
 
   return (
