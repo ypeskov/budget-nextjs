@@ -1,16 +1,16 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { useAuthTimer } from "@/hooks/authHook";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { request } from "@/utils/request/browser";
 import apiRoutes from "@/routes/apiRoutes";
+import { useSessionStore } from "@/store/sessionStore";
 
-interface User {
+type User = {
   email: string | null;
   token: string | null;
 }
 
-interface UserContextType {
+type UserContextType = {
   user: User;
   setUser: (user: User) => void;
   expireTime: number | null;
@@ -28,9 +28,7 @@ const defaultUser: User = { email: null, token: null };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-
-  const { expireTime, resetTimer: originalResetTimer } = useAuthTimer("en");
-  const resetTimer = useMemo(() => () => originalResetTimer(), [originalResetTimer]);
+  const { expireTime, resetTimer } = useSessionStore();
 
   const [token, setToken] = useState<string | null>(null);
 

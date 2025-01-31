@@ -1,6 +1,7 @@
 import { getCookie } from "@/utils/cookies";
 import { request as clientRequest } from "@/utils/request/fetch";
 import { UnauthorizedError, ValidationError } from "./errors";
+import { useSessionStore } from "@/store/sessionStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -14,6 +15,13 @@ export async function request(url: string, options: RequestInit) {
 
   try {
     const response = await clientRequest(url, { ...options, headers });
+
+    const newToken = response.headers.get("new_access_token");
+    if (newToken) {
+      console.log("New token", newToken);
+      useSessionStore.getState().resetTimer(); // Вызов без хуков
+    }
+
     return await response.json();
   } catch (error) {
     if (error instanceof UnauthorizedError) {

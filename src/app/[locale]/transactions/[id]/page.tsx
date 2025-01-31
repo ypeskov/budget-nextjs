@@ -5,20 +5,20 @@ import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { request } from "@/utils/request/api";
 import { UnauthorizedError, ValidationError } from "@/utils/request/errors";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/routing";
 import routes from "@/routes/routes";
 
 interface TransactionPageProps {
   params: Promise<{ id: string, locale: string }>;
 }
 
-async function fetchTransaction(id: number): Promise<Transaction | null> {
+async function fetchTransaction(id: number, locale: string): Promise<Transaction | null> {
   try {
     const response = await request(apiRoutes.transaction(id), { cache: "no-store" });
     return response;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      redirect(routes.login({}));
+      redirect({ href: routes.login({}), locale });
       return null;
     }
     if (error instanceof ValidationError) {
@@ -36,7 +36,7 @@ export default async function TransactionPage({ params }: TransactionPageProps) 
   const locale = resolvedParams.locale;
 
   let transaction: Transaction | null = null;
-  transaction = await fetchTransaction(id);
+  transaction = await fetchTransaction(id, locale);
 
   return (
     <div>
