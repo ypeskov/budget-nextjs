@@ -29,10 +29,8 @@ export default function TransactionsListView({ transactions, locale, searchParam
     setLoading(true);
     try {
       const transactionsUrl = prepareRequestUrl(page, searchParams);
-      const data: Transaction[] = await clientRequest(transactionsUrl, {
-        cache: "no-store",
-      });
-  
+      const data: Transaction[] = await clientRequest(transactionsUrl, { cache: "no-store" }, router);
+
       if (data.length === 0) {
         setHasMore(false);
       } else {

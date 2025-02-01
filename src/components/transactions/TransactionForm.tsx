@@ -4,14 +4,14 @@ import { useTranslations } from "next-intl";
 import { Transaction } from "@/types/transactions";
 import { useEffect, useState } from "react";
 import ApiRoutes from "@/routes/apiRoutes";
-import { getCookie } from "@/utils/cookies";
 import { Account } from "@/types/accounts";
 import { Category } from "@/types/categories";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import routes from "@/routes/routes";
+import { request } from "@/utils/request/browser";
 
-interface TransactionFormProps {
+type TransactionFormProps = {
   locale: string;
   closeForm: () => void;
   transaction?: Transaction;
@@ -32,44 +32,38 @@ type TransactionRequest = {
 };
 
 const fetchAccounts = async () => {
-  const authToken = getCookie('authToken');
-  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-  const accounts = await fetch(ApiRoutes.accounts(), { headers });
-  if (accounts.ok) {
-    return accounts.json();
+  try {
+    const accounts = await request(ApiRoutes.accounts(), { cache: "no-store" });
+    return accounts;
+  } catch (error) {
+    console.error('Failed to fetch accounts', error);
+    return null;
   }
-  return [];
 };
 
 const fetchCategories = async () => {
-  const authToken = getCookie('authToken');
-  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
-  const categories = await fetch(ApiRoutes.categories(), { headers });
-  if (categories.ok) {
-    const data: Category[] = await categories.json();
-    return {
-      expenseCategories: data.filter(category => category.isIncome === false),
-      incomeCategories: data.filter(category => category.isIncome === true),
-    };
+  try {
+    const categories = await request(ApiRoutes.categories(), { cache: "no-store" });
+    return categories;
+  } catch (error) {
+    console.error('Failed to fetch categories', error);
+    return null;
   }
-  return { expenseCategories: [], incomeCategories: [] };
 };
 
-const submitTransaction = async (transactionRequest: TransactionRequest, isNewTransaction: boolean): Promise<Transaction | null> => {
-  const authToken = getCookie('authToken');
-  const headers: HeadersInit = authToken ? { "auth-token": authToken } : {};
 
+const submitTransaction = async (transactionRequest: TransactionRequest, isNewTransaction: boolean): Promise<Transaction | null> => {
   const method = isNewTransaction ? 'POST' : 'PUT';
-  const response = await fetch(ApiRoutes.submitTransaction(), {
-    method,
-    headers: { "Content-Type": "application/json", ...headers },
-    body: JSON.stringify(transactionRequest),
-  });
-  if (response.ok) {
-    return response.json();
+  try {
+    const response = await request(ApiRoutes.submitTransaction(), {
+      method,
+      body: JSON.stringify(transactionRequest),
+    });
+    return response;
+  } catch (error) {
+    console.error('Failed to submit transaction', error);
+    return null;
   }
-  console.error(response);
-  return null;
 };
 
 export const TransactionForm = ({ locale, closeForm, transaction }: TransactionFormProps) => {
@@ -97,11 +91,25 @@ export const TransactionForm = ({ locale, closeForm, transaction }: TransactionF
   const router = useRouter();
 
   useEffect(() => {
-    fetchAccounts().then(setAccounts);
-    fetchCategories().then(({ expenseCategories, incomeCategories }) => {
-      setExpenseCategories(expenseCategories);
-      setIncomeCategories(incomeCategories);
-    });
+    async function fetchData() {
+      const accs = await fetchAccounts();
+      if (accs) {
+        setAccounts(accs);
+      } else {
+        console.error('Failed to fetch accounts');
+        throw new Error('Failed to fetch accounts');
+      }
+      const cats = await fetchCategories();
+      if (cats) {
+        setExpenseCategories(cats.filter((cat: Category) => cat.isIncome === false));
+        setIncomeCategories(cats.filter((cat: Category) => cat.isIncome === true));
+      } else {
+        console.error('Failed to fetch categories');
+        setExpenseCategories([]);
+        setIncomeCategories([]);
+      }
+    }
+    fetchData();
   }, []);
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -273,7 +281,6 @@ export const TransactionForm = ({ locale, closeForm, transaction }: TransactionF
               </div>
             </>
           )}
-
           {/* Category */}
           {transactionType !== 'transfer' && (
             <div>

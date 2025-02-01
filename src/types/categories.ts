@@ -1,4 +1,4 @@
-export interface Category {
+export type Category = {
   name: string;
   parentId: number;
   isIncome: boolean;
@@ -9,12 +9,12 @@ export interface Category {
   children: Category[];
 }
 
-export interface CategoryExpense {
+export type CategoryExpense = {
   id: number;
   name: string;
   totalExpenses: number;
   parentId: number | null;
   parentName: string | null;
-  currencyCode: string;
+  currencyCode: string | null;
   isParent: boolean;
 }

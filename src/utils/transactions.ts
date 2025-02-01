@@ -1,4 +1,3 @@
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 const transactionsPerPage = Number(process.env.NEXT_PUBLIC_TRANSACTIONS_PER_PAGE);
 
 export function prepareRequestUrl(page: number, searchParams: Record<string, string | undefined>): string {
@@ -12,5 +11,5 @@ export function prepareRequestUrl(page: number, searchParams: Record<string, str
     ...(searchParams.categories && { categories: searchParams.categories }),
   });
 
-  return `${apiBaseUrl}/transactions/?${params.toString()}`;
+  return `/transactions/?${params.toString()}`;
 }
