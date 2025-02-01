@@ -4,6 +4,7 @@ import { UnauthorizedError, ValidationError } from "./errors";
 
 export const API_URL = process.env.API_BASE_URL || "";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function request(url: string, options: RequestInit): Promise<{ data: any, newToken: string | null }> {
   url = API_URL + url;
   const token = await getAuthToken();

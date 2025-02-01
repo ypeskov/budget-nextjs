@@ -7,8 +7,11 @@ import { getCookie } from "@/utils/cookies";
 
 export default function SessionProvider({ children, locale }: { children: React.ReactNode; locale: string }) {
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setRouter = useSessionStore((state: any) => state.setRouter);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setLocale = useSessionStore((state: any) => state.setLocale);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resetTimer = useSessionStore((state: any) => state.resetTimer);
 
   useEffect(() => {
