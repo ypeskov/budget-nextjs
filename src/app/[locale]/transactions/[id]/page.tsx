@@ -7,15 +7,16 @@ import { request } from "@/utils/request/api";
 import { UnauthorizedError, ValidationError } from "@/utils/request/errors";
 import { redirect } from "@/i18n/routing";
 import routes from "@/routes/routes";
+import HiddenAuth from "@/components/common/HiddenAuth";
 
 interface TransactionPageProps {
   params: Promise<{ id: string, locale: string }>;
 }
 
-async function fetchTransaction(id: number, locale: string): Promise<Transaction | null> {
+async function fetchTransaction(id: number, locale: string): Promise<{ data: Transaction, newToken: string | null } | null> {
   try {
     const response = await request(apiRoutes.transaction(id), { cache: "no-store" });
-    return response;
+    return { data: response.data, newToken: response.newToken };
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect({ href: routes.login({}), locale });
@@ -35,13 +36,14 @@ export default async function TransactionPage({ params }: TransactionPageProps) 
   const id = Number(resolvedParams.id);
   const locale = resolvedParams.locale;
 
-  let transaction: Transaction | null = null;
+  let transaction: { data: Transaction, newToken: string | null } | null = null;
   transaction = await fetchTransaction(id, locale);
 
   return (
     <div>
       <NextIntlClientProvider locale={locale} messages={await getMessages()}>
-        {transaction && <TransactionDetails locale={locale} transaction={transaction} />}
+        <HiddenAuth newAccessToken={transaction?.newToken || ''} />
+        {transaction && <TransactionDetails locale={locale} transaction={transaction.data} />}
         {!transaction && <div className="flex justify-center items-center h-screen error-message">Transaction not found</div>}
       </NextIntlClientProvider>
     </div>

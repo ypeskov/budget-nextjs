@@ -1,27 +1,25 @@
 // src/store/sessionStore.ts
 import { create } from "zustand";
 import routes from "@/routes/routes";
-import { useRouter } from "next/navigation";
 
 const SESSION_TIMEOUT_MINUTES = parseInt(process.env.NEXT_PUBLIC_SESSION_TIMEOUT || "30", 10); // default 30 minutes
 const SESSION_TIMEOUT = SESSION_TIMEOUT_MINUTES * 60 * 1000;
 
 interface SessionState {
   expireTime: number | null;
-  resetTimer: () => void;
-  logout: () => void;
+  resetTimer: (router?: any) => void;
+  logout: (router: any) => void;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => {
   let timer: ReturnType<typeof setTimeout> | null = null;
 
-  const logout = () => {
+  const logout = (router: any) => {
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    const router = useRouter();
-    router.push(routes.login({ locale: "en" })); // локаль можно передавать динамически
+    router.push(routes.login({ locale: "en" }));
   };
 
-  const resetTimer = () => {
+  const resetTimer = (router?: any) => {
     const newExpireTime = Date.now() + SESSION_TIMEOUT;
     set({ expireTime: newExpireTime });
 
@@ -30,7 +28,7 @@ export const useSessionStore = create<SessionState>((set, get) => {
     }
 
     timer = setTimeout(() => {
-      get().logout();
+      get().logout(router);
     }, SESSION_TIMEOUT);
   };
 

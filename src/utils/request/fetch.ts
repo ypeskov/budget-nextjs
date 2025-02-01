@@ -14,10 +14,10 @@ export async function request(url: string, options: RequestInit) {
         const error = await response.json();
         throw new ValidationError('Validation error', error.detail);
       }
-
+      console.log('response', JSON.stringify(response));
       throw new Error('Unknown error', { cause: response });
     }
-
+    
     return response;
   } catch (error) {
     console.error(error);

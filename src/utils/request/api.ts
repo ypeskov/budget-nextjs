@@ -4,7 +4,7 @@ import { UnauthorizedError, ValidationError } from "./errors";
 
 export const API_URL = process.env.API_BASE_URL || "";
 
-export async function request(url: string, options: RequestInit) {
+export async function request(url: string, options: RequestInit): Promise<{ data: any, newToken: string | null }> {
   url = API_URL + url;
   const token = await getAuthToken();
   const headers = {
@@ -14,7 +14,15 @@ export async function request(url: string, options: RequestInit) {
 
   try {
     const response = await apiRequest(url, { ...options, headers });
-    return await response.json();
+    const newToken = response.headers.get("new_access_token");
+    let data;
+    if (response instanceof Response && response) {
+      data = await response.json();
+    } else {
+      data = response;
+    }
+
+    return { data, newToken };
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       console.log('Unauthorized', JSON.stringify(error));
@@ -24,6 +32,7 @@ export async function request(url: string, options: RequestInit) {
       console.log(`ValidationError: ${JSON.stringify(error)}`);
       throw error;
     }
+    console.log('error', error);
     throw new Error('Unknown error', { cause: error });
   }
 }

@@ -5,19 +5,20 @@ import { Transaction } from "@/types/transactions";
 import TransactionsFilter from '@/components/transactions/TransactionsFilter';
 import { request } from "@/utils/request/api";
 import routes from "@/routes/apiRoutes";
+import HiddenAuth from "@/components/common/HiddenAuth";
 
 interface RequestParams {
   params: Promise<{ id: string, locale: string }>;
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-async function fetchAccount(id: number): Promise<Account> {
+async function fetchAccount(id: number): Promise<{ data: Account, newToken: string | null }> {
   return request(routes.account(id), {
     cache: "no-store",
   });
 }
 
-async function fetchTransactions(accountId: number): Promise<Transaction[]> {
+async function fetchTransactions(accountId: number): Promise<{ data: Transaction[], newToken: string | null }> {
   const transactionsUrl = routes.transactions(1, { accounts: String(accountId) });
   return request(transactionsUrl, {
     cache: "no-store",
@@ -31,8 +32,8 @@ export default async function AccountDetailsPage({ params, searchParams }: Reque
   const resolvedSearchParams = await searchParams;
   resolvedSearchParams['accounts'] = String(id);
 
-  let account: Account | undefined;
-  let transactions: Transaction[] | undefined;
+  let account: { data: Account, newToken: string | null } | undefined;
+  let transactions: { data: Transaction[], newToken: string | null } | undefined;
   try {
     [account, transactions] = await Promise.all([
       fetchAccount(id),
@@ -48,13 +49,14 @@ export default async function AccountDetailsPage({ params, searchParams }: Reque
 
   return (
     <>
-      <AccountDetails account={account} locale={locale} />
+      <HiddenAuth newAccessToken={account.newToken || ''} />
+      <AccountDetails account={account.data} locale={locale} />
 
       <div className="mt-4 mb-4">
-        <TransactionsFilter accounts={[account]} locale={locale} searchParams={resolvedSearchParams} />
+        <TransactionsFilter accounts={[account.data]} locale={locale} searchParams={resolvedSearchParams} />
       </div>
 
-      <TransactionsListView transactions={transactions} locale={locale} searchParams={resolvedSearchParams} />
+      <TransactionsListView transactions={transactions.data} locale={locale} searchParams={resolvedSearchParams} />
     </>
   );
 }

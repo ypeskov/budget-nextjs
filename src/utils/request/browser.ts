@@ -5,7 +5,7 @@ import { useSessionStore } from "@/store/sessionStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-export async function request(url: string, options: RequestInit) {
+export async function request(url: string, options: RequestInit, router?: any) {
   url = API_URL + url;
   const token = getCookie("authToken");
   const headers = {
@@ -15,11 +15,9 @@ export async function request(url: string, options: RequestInit) {
 
   try {
     const response = await clientRequest(url, { ...options, headers });
-
     const newToken = response.headers.get("new_access_token");
-    if (newToken) {
-      console.log("New token", newToken);
-      useSessionStore.getState().resetTimer(); // Вызов без хуков
+    if (newToken && router) {
+      useSessionStore.getState().resetTimer(router);
     }
 
     return await response.json();

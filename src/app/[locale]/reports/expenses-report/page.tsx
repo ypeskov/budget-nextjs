@@ -9,13 +9,19 @@ import { redirect } from "next/navigation";
 import routes from "@/routes/routes";
 import { UnauthorizedError } from "@/utils/request/errors";
 import { AggregatedExpense } from "@/types/reports";
+import HiddenAuth from "@/components/common/HiddenAuth";
+import { CategoryExpense } from "@/types/reports";
+import Diagram from "@/components/reports/expenses/Diagram";
 
 type ExpensesReportPageProps = {
   searchParams: Promise<Record<string, string | undefined>>;
   params: Promise<{ locale: string }>
 }
 
-const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
+const getExpenses = async (fromDate: string,
+  toDate: string,
+  hideEmptyCategories: boolean,
+  locale: string): Promise<{ data: CategoryExpense[], newToken: string | null }> => {
   try {
     const expenses = await request(apiRoutes.expenses(), {
       method: 'POST',
@@ -25,17 +31,22 @@ const getExpenses = async (fromDate: string, toDate: string, hideEmptyCategories
         hideEmptyCategories: hideEmptyCategories,
       }),
     });
-    return expenses;
+
+    return { data: expenses.data, newToken: expenses.newToken };
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect(routes.login({ locale }));
     }
     console.error(error);
-    return null;
+    return { data: [], newToken: null };
   }
 }
 
-const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmptyCategories: boolean, locale: string) => {
+const getAggregatedExpenses = async (
+  fromDate: string,
+  toDate: string,
+  hideEmptyCategories: boolean,
+  locale: string): Promise<{ data: AggregatedExpense[], newToken: string | null }> => {
   try {
     const aggregatedExpenses = await request(apiRoutes.expensesAggregate(), {
       method: 'POST',
@@ -46,27 +57,34 @@ const getAggregatedExpenses = async (fromDate: string, toDate: string, hideEmpty
       }),
     });
 
-    return aggregatedExpenses;
+    return { data: aggregatedExpenses.data, newToken: aggregatedExpenses.newToken };
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect(routes.login({ locale }));
     }
     console.error(error);
-    return null;
+    return { data: [], newToken: null };
   }
 }
 
-const getDiagramUrl = async (fromDate: string, toDate: string, locale: string) => {
+const getDiagramUrl = async (
+  fromDate: string,
+  toDate: string,
+  locale: string): Promise<{ data: string | null, newToken: string | null }> => {
   const diagramUrl = apiRoutes.expensesDiagram(fromDate, toDate);
   try {
-    const diagram = await request(diagramUrl, {});
-    return diagram.image; // Base64 string
+    const data = await request(diagramUrl, {});
+    const newToken = data.newToken ?? null;
+    if (data && data.data?.image) {
+      return { data: data.data.image, newToken: newToken }; // Base64 string
+    }
+    return { data: null, newToken: newToken }; // Base64 string
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect(routes.login({ locale: locale }));
     }
     console.error(error);
-    return null;
+    return { data: null, newToken: null };
   }
 }
 
@@ -85,11 +103,14 @@ async function ExpensesReportPage({ searchParams, params }: ExpensesReportPagePr
     hideEmptyCategoriesInitial = false;
   }
 
-  const [responseExpenses, responseAggregated, responseDiagram] = await Promise.all([
-    getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
-    getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
-    getDiagramUrl(fromDateInitial, toDateInitial, locale),
-  ])
+  const [
+    { data: responseExpenses, newToken: responseExpensesNewToken },
+    { data: responseAggregated, newToken: responseAggregatedNewToken },
+    { data: responseDiagram, newToken: responseDiagramNewToken }] = await Promise.all([
+      getExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
+      getAggregatedExpenses(fromDateInitial, toDateInitial, hideEmptyCategoriesInitial, locale),
+      getDiagramUrl(fromDateInitial, toDateInitial, locale),
+    ]);
 
   if (!responseExpenses || !responseAggregated) {
     return (<div>
@@ -102,6 +123,7 @@ async function ExpensesReportPage({ searchParams, params }: ExpensesReportPagePr
 
   return (
     <>
+      <HiddenAuth newAccessToken={responseExpensesNewToken ?? responseAggregatedNewToken ?? responseDiagramNewToken ?? ''} />
       <div className="mb-4">
         <h1 className="heading-lg">{t("expensesReport")}</h1>
       </div>
@@ -131,21 +153,25 @@ async function ExpensesReportPage({ searchParams, params }: ExpensesReportPagePr
       {aggregatedSum > 0 && (
         <div className="mb-4 flex">
           <div className="w-1/2 flex justify-center items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={responseDiagram || ''} alt={t("diagram")} />
+            <Diagram diagramSrc={responseDiagram} noDataText={t("noData")} />
           </div>
 
           <div className="w-1/2 flex justify-center items-center">
-            <AggregatedExpenses
+            {responseAggregated.length > 0 && <AggregatedExpenses
               aggregatedCategories={responseAggregated}
               aggregatedSum={aggregatedSum}
-              currencyCode={responseExpenses[0].currencyCode} />
+              currencyCode={responseExpenses[0].currencyCode ?? ''} />}
           </div>
+        </div>
+      )}
+      {aggregatedSum === 0 && (
+        <div className="mb-4 flex justify-center items-center">
+          <p className="text-red-500 text-center text-lg font-bold mb-4 ">{t("noData")}</p>
         </div>
       )}
 
       {aggregatedSum > 0 && <CategoriesExpenses
-        expenses={responseExpenses}
+        expenses={responseExpenses as CategoryExpense[]}
         locale={locale}
         fromDate={fromDateInitial}
         toDate={toDateInitial} />}
