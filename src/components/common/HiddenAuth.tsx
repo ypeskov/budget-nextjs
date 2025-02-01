@@ -20,7 +20,7 @@ export default function HiddenAuth({ newAccessToken }: { newAccessToken: string 
         sessionStorage.setItem("sessionExpireTime", String(Date.now() + SESSION_TIMEOUT));
       }
     }
-  }, [newAccessToken, resetTimer]);
+  }, [newAccessToken, resetTimer, router]);
 
   return null;
 }

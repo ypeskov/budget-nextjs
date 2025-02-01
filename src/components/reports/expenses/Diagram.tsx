@@ -5,7 +5,7 @@ type DiagramProps = {
 
 export default function Diagram({ diagramSrc, noDataText }: DiagramProps) {
   return (
-    <div className="w-1/2 flex justify-center items-center">
+    <div className="flex justify-center items-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {diagramSrc ? <img src={diagramSrc} alt="Diagram" /> : (
         <p className="text-red-500 text-center text-lg font-bold mb-4">{noDataText}</p>

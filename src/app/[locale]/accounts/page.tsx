@@ -1,23 +1,13 @@
-'use server';
-
 import { BaseCurrency, Accounts } from '@/types/accounts';
 import AccountsList from '@/components/accounts/AccountsList';
 import FilterControls from "@/components/accounts/FilterControls";
 import { request } from "@/utils/request/api";
 import apiRoutes from "@/routes/apiRoutes";
-import { cookies } from 'next/headers';
 import HiddenAuth from '@/components/common/HiddenAuth';
 
 type AccountsPageParams = {
   searchParams: Promise<Record<string, string | undefined>>;
   params: Promise<{ locale: string }>
-}
-
-export async function setAuthToken(token: string) {
-  "use server";
-  const cookieStore = await cookies();
-  console.log("setAuthToken called on server with token:", token);
-  cookieStore.set('authToken', token);
 }
 
 export default async function AccountsPage({

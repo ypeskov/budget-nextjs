@@ -36,6 +36,7 @@ const fetchAccounts = async () => {
     const accounts = await request(ApiRoutes.accounts(), { cache: "no-store" });
     return accounts;
   } catch (error) {
+    console.error('Failed to fetch accounts', error);
     return null;
   }
 };
@@ -45,6 +46,7 @@ const fetchCategories = async () => {
     const categories = await request(ApiRoutes.categories(), { cache: "no-store" });
     return categories;
   } catch (error) {
+    console.error('Failed to fetch categories', error);
     return null;
   }
 };
