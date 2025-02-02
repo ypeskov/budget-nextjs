@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useSessionStore } from "@/store/sessionStore";
 import { getCookie } from "@/utils/cookies";
 
+const SESSION_TIMEOUT_MINUTES = parseInt(process.env.NEXT_PUBLIC_SESSION_TIMEOUT || "30", 10);
+const SESSION_TIMEOUT_SECONDS = SESSION_TIMEOUT_MINUTES * 60;
+
 export default function SessionProvider({ children, locale }: { children: React.ReactNode; locale: string }) {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +27,7 @@ export default function SessionProvider({ children, locale }: { children: React.
       if (authToken) {
         console.log("Auth token updated, resetting session timer...");
         resetTimer();
-        sessionStorage.setItem("sessionExpireTime", String(Date.now() + 30 * 60 * 1000)); // 30 минут
+        sessionStorage.setItem("sessionExpireTime", String(Date.now() + SESSION_TIMEOUT_SECONDS));
       }
     };
 

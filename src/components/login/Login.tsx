@@ -53,6 +53,7 @@ export default function LoginPage({ locale }: LoginPageProps) {
       const userProfile = await request(apiRoutes.profile(), {});
 
       setUser({ email: userProfile.email, token: accessToken });
+      sessionStorage.setItem("user", JSON.stringify({ email: userProfile.email, token: accessToken }));
       resetTimer();
       router.push(routes.accounts({ locale }));
     } catch (error) {

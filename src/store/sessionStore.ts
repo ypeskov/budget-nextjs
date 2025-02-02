@@ -19,7 +19,10 @@ export const useSessionStore = create<SessionState>((set, get) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const logout = (router: any) => {
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    router.push(routes.login({ locale: "en" }));
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("sessionExpireTime");
+    // router.push(routes.login({ locale: "en" }));
+    window.location.href = routes.login({ locale: "en" });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

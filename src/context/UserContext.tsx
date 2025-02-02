@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { request } from "@/utils/request/browser";
-import apiRoutes from "@/routes/apiRoutes";
 import { useSessionStore } from "@/store/sessionStore";
 
 type User = {
@@ -30,33 +28,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const { expireTime, resetTimer } = useSessionStore();
 
-  const [token, setToken] = useState<string | null>(null);
-
   useEffect(() => {
-    const loadUserProfile = async () => {
-      const tokenFromCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("authToken="))
-        ?.split("=")[1];
-
-      if (!tokenFromCookie) {
-        setUser(null);
-        return;
+    if (!user) {
+      const sessionStorageUser = sessionStorage.getItem("user");
+      if (sessionStorageUser) {
+        setUser(JSON.parse(sessionStorageUser));
       }
-      setToken(tokenFromCookie);
-
-      try {
-        const userProfileResponse = await request(apiRoutes.profile(), {});
-        setUser({ email: userProfileResponse.email, token });
-        resetTimer();
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setUser(null);
-      }
-    };
-
-    loadUserProfile();
-  }, [token, resetTimer]);
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user: user || defaultUser, setUser, expireTime, resetTimer }}>
