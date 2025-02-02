@@ -14,6 +14,7 @@ export default function LogoutPage() {
     useEffect(() => {
         document.cookie = "authToken=; path=/; max-age=0;";
         setUser({ email: null, token: null });
+        sessionStorage.removeItem("user");
         router.push(routes.login({ locale }));
     }, [router, locale, setUser]);
 

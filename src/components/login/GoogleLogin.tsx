@@ -34,6 +34,7 @@ const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({ locale }) => {
     const userResponse = await request(apiRoutes.profile(), {});
 
     setUser({ email: userResponse.email, token: loginResponse.accessToken });
+    sessionStorage.setItem("user", JSON.stringify({ email: userResponse.email, token: loginResponse.accessToken }));
     resetTimer();
 
     router.push(routes.accounts({ locale }));

@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { request } from "@/utils/request/browser";
-import apiRoutes from "@/routes/apiRoutes";
 import { useSessionStore } from "@/store/sessionStore";
 
 type User = {
@@ -30,7 +28,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const { expireTime, resetTimer } = useSessionStore();
 
-  const [token, setToken] = useState<string | null>(null);
+  useEffect(() => {
+    if (!user) {
+      const sessionStorageUser = sessionStorage.getItem("user");
+      if (sessionStorageUser) {
+        setUser(JSON.parse(sessionStorageUser));
+      }
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user: user || defaultUser, setUser, expireTime, resetTimer }}>
