@@ -32,32 +32,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      const tokenFromCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("authToken="))
-        ?.split("=")[1];
-
-      if (!tokenFromCookie) {
-        setUser(null);
-        return;
-      }
-      setToken(tokenFromCookie);
-
-      try {
-        const userProfileResponse = await request(apiRoutes.profile(), {});
-        setUser({ email: userProfileResponse.email, token });
-        resetTimer();
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setUser(null);
-      }
-    };
-
-    loadUserProfile();
-  }, [token, resetTimer]);
-
   return (
     <UserContext.Provider value={{ user: user || defaultUser, setUser, expireTime, resetTimer }}>
       {children}
